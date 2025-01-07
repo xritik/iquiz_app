@@ -1,0 +1,193 @@
+@import url('https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css');
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}
+
+.homeSection{
+  height: 100vh;
+}
+nav{
+  height: 65px;
+  width: 100vw;
+  /* position: fixed; */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.navbar{
+  width: 95%;
+  height: 55px;
+  background-color: gray;
+  border-radius: 8px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+  display: flex;
+}
+.nav1, .nav2, .nav3{
+  width: 20%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+}
+.nav1{
+  font-size: 30px;
+  font-weight: bold;
+}
+.nav2{
+  width: 60%;
+}
+.nav3{
+  gap: 10px;
+}
+.bName1 {
+  color: yellow;
+  transition: color 0.3s ease-in-out;
+}
+.bName2 {
+  transition: color 0.3s ease-in-out;
+}
+.bName1:hover{
+  color: white;
+  cursor: pointer;
+}
+.bName2:hover{
+  color: yellow;
+  cursor: pointer;
+}
+.bName1:hover ~ .bName2{
+  color: yellow;
+}
+.loginButton{
+  padding: 6px 15px 6px 15px;
+  font-size: 17px;
+  background-color: rgb(255, 255, 106);
+  outline: none;
+  border: 1px solid black;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+.loginButton:hover{
+  background-color: rgb(255, 255, 132);
+}
+.loginButton:active{
+  scale: .9;
+  background-color: yellow;
+}
+.signupButton{
+  padding: 6px 15px 6px 15px;
+  font-size: 17px;
+  background-color: rgb(233, 233, 233);
+  outline: none;
+  border: 1px solid black;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+.signupButton:hover{
+  background-color: white;
+}
+.signupButton:active{
+  scale: .9;
+  background-color: rgb(178, 178, 178);
+}
+.homePage{
+  display: flex;
+  justify-content: center;
+}
+.homePageForm{
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding-top: 100px;
+  gap: 20px;
+  input{
+    width: 300px;
+    height: 40px;
+    font-size: 19px;
+    color: rgb(128, 128, 128);
+    outline: none;
+    border-radius: 10px;
+    display: flex;
+    text-align: center;
+  }
+  button{
+    width: 100px;
+  }
+}
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+hr{
+  margin-top: 30px;
+}
+footer{
+  padding-top: 10px;
+  display: flex;
+  width: 100vw;
+}
+.footer1{
+  width: 20%;
+  text-align: center;
+}
+.footer2{
+  width: 60%;
+  text-align: center;
+  font-size: 30px;
+  font-weight: bold;
+}
+.fName1{
+  color: rgb(255, 247, 0);
+}
+.fName2{
+  color: rgb(105, 105, 105);
+}
+a{
+  text-decoration: none;
+}
+.socialMedia{
+  width: 20%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  a{
+    display: flex;
+  }
+}
+.media{
+  height: 35px;
+  width: 35px;
+  border: 2px solid black;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 25px;
+  transition: .4s ease-in-out;
+  color: black;
+}
+.media:hover{
+  background-color: black;
+  color: white;
+  /* transform: rotateY(360deg); */
+}
+.media:active{
+  scale: .7;
+}
