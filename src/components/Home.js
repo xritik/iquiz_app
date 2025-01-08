@@ -1,6 +1,11 @@
 import React from 'react'
 
-const Home = () => {
+const Home = ({navigate}) => {
+
+  const handleLogin = () => {
+    navigate('/login_signUp')
+  }
+
   return (
     <div className='homeSection'>
       <nav>
@@ -8,7 +13,7 @@ const Home = () => {
           <div className='nav1'><span className='bName1'>IQ</span><span className='bName2'>uiz</span></div>
           <div className='nav2'></div>
           <div className='nav3'>
-          <button className='loginButton'>Login</button>
+          <button className='loginButton' onClick={handleLogin}>Login</button>
           <button className='signupButton'>Sign-up</button>
           </div>
         </div>
@@ -38,9 +43,9 @@ const Home = () => {
           <span className='fName1'>IQ</span><span className='fName2'>uiz</span>
         </div>
         <div className='socialMedia'>
-          <a href='https://github.com/xritik' target='_blank'><span className='media'><i class='bx bxl-github'></i></span></a>
-          <a href='https://linkedin.com/in/xritik' target='_blank'><span className='media'><i class='bx bxl-linkedin'></i></span></a>
-          <a href='https://instagram.com/rittik__here' target='_blank'><span className='media'><i class='bx bxl-instagram'></i></span></a>
+          <a href='https://github.com/xritik' target='_blank'><span className='media'><i className='bx bxl-github'></i></span></a>
+          <a href='https://linkedin.com/in/xritik' target='_blank'><span className='media'><i className='bx bxl-linkedin'></i></span></a>
+          <a href='https://instagram.com/rittik__here' target='_blank'><span className='media'><i className='bx bxl-instagram'></i></span></a>
         </div>
       </footer>
     </div>
