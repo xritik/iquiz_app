@@ -1,9 +1,25 @@
-body{
+.login-signup-section{
     display: flex;
     justify-content: center;
     align-items: center;
     min-height: 100vh;
     background-color: #081b29;
+}
+.back_arrow{
+    color: white;
+    position: absolute;
+    top: 0;
+    left: 0;
+    font-size: 30px;
+    padding: 3px;
+    cursor: pointer;
+    transition: .5s;
+}
+.back_arrow:hover{
+    color: #0ef;
+}
+.back_arrow:active{
+    scale: .8;
 }
 .wrapper{
     position: relative;

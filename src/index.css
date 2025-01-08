@@ -5,8 +5,8 @@
   padding: 0;
   box-sizing: border-box;
   font-family: 'Poppins', sans-serif;
+  /* color: #fff; */
 }
-
 body {
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
@@ -18,6 +18,8 @@ body {
 
 .homeSection{
   height: 100vh;
+  /* background: #1f242d; */
+  background: #081b29;
 }
 nav{
   height: 65px;
@@ -30,9 +32,11 @@ nav{
 .navbar{
   width: 95%;
   height: 55px;
-  background-color: gray;
+  /* background: #1f242d; */
+  /* background: #323946; */
+  background: #081b29;
   border-radius: 8px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 4px 10px #0ef;
   display: flex;
 }
 .nav1, .nav2, .nav3{
@@ -49,49 +53,52 @@ nav{
 }
 .nav2{
   width: 60%;
+  gap: 30px;
 }
 .nav3{
   gap: 10px;
 }
 .bName1 {
-  color: yellow;
+  color: #0ef;
   transition: color 0.3s ease-in-out;
 }
 .bName2 {
   transition: color 0.3s ease-in-out;
 }
 .bName1:hover{
-  color: white;
+  color: #fff;
   cursor: pointer;
 }
 .bName2:hover{
-  color: yellow;
+  color: #0ef;
   cursor: pointer;
 }
 .bName1:hover ~ .bName2{
-  color: yellow;
+  color: #0ef;
 }
 .loginButton{
   padding: 6px 15px 6px 15px;
   font-size: 17px;
-  background-color: rgb(255, 255, 106);
+  color: #1f242d;
+  background: #0ef;
+  box-shadow: 0px 0px 10px 1.5px #0ef;
   outline: none;
-  border: 1px solid black;
+  border: none;
   border-radius: 4px;
   cursor: pointer;
-  transition: 0.3s;
+  transition: 0.5s;
 }
 .loginButton:hover{
-  background-color: rgb(255, 255, 132);
+  box-shadow: none;
 }
 .loginButton:active{
   scale: .9;
-  background-color: yellow;
+  background: rgb(0, 158, 169);
 }
-.signupButton{
+/* .signupButton{
   padding: 6px 15px 6px 15px;
   font-size: 17px;
-  background-color: rgb(233, 233, 233);
+  background: rgb(233, 233, 233);
   outline: none;
   border: 1px solid black;
   border-radius: 4px;
@@ -104,7 +111,7 @@ nav{
 .signupButton:active{
   scale: .9;
   background-color: rgb(178, 178, 178);
-}
+} */
 .homePage{
   display: flex;
   justify-content: center;
@@ -120,7 +127,9 @@ nav{
     width: 300px;
     height: 40px;
     font-size: 19px;
-    color: rgb(128, 128, 128);
+    background: rgb(101, 233, 242);
+    letter-spacing: 1px;
+    font-weight: bold;
     outline: none;
     border-radius: 10px;
     display: flex;
@@ -129,6 +138,15 @@ nav{
   button{
     width: 100px;
   }
+  p{
+    color: #fff;
+  }
+}
+.homePageForm input::placeholder{
+  color: rgb(128, 128, 128);
+  font-size: 16px;
+  letter-spacing: normal;
+  font-weight: 500;
 }
 input[type="number"]::-webkit-inner-spin-button,
 input[type="number"]::-webkit-outer-spin-button {
@@ -136,12 +154,13 @@ input[type="number"]::-webkit-outer-spin-button {
   margin: 0;
 }
 hr{
-  margin-top: 30px;
+  margin-top: 70px;
 }
 footer{
-  padding-top: 10px;
+  padding-top: 20px;
   display: flex;
   width: 100vw;
+  color: #fff;
 }
 .footer1{
   width: 20%;
@@ -154,13 +173,16 @@ footer{
   font-weight: bold;
 }
 .fName1{
-  color: rgb(255, 247, 0);
-}
-.fName2{
-  color: rgb(105, 105, 105);
+  color: #0ef;
 }
 a{
   text-decoration: none;
+  color: #0ef;
+  transition: .5s;
+  cursor: pointer;
+}
+a:hover{
+  text-decoration: underline;
 }
 .socialMedia{
   width: 20%;
@@ -170,24 +192,30 @@ a{
   gap: 10px;
   a{
     display: flex;
+    text-decoration: none;
   }
 }
 .media{
-  height: 35px;
-  width: 35px;
-  border: 2px solid black;
+  height: 37px;
+  width: 37px;
+  border: 2px solid #0ef;
   border-radius: 50%;
   cursor: pointer;
   display: flex;
   justify-content: center;
   align-items: center;
-  font-size: 25px;
-  transition: .4s ease-in-out;
-  color: black;
+  font-size: 23px;
+  transition: .3s ease;
+  i{
+    color: #0ef;
+  }
 }
 .media:hover{
-  background-color: black;
-  color: white;
+  background-color: #0ef;
+  box-shadow: 0px 0px 7px 1px #0ef;
+  i{
+    color: #1f242d;
+  }
   /* transform: rotateY(360deg); */
 }
 .media:active{

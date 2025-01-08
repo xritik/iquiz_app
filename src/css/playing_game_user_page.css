@@ -1,0 +1,79 @@
+.section{
+    min-height: 100vh;
+    background: #081b29;
+}
+.back_arrow{
+    color: white;
+    position: absolute;
+    top: 0;
+    left: 0;
+    font-size: 30px;
+    padding: 3px;
+    cursor: pointer;
+    transition: .5s;
+}
+.back_arrow:hover{
+    color: #0ef;
+}
+.back_arrow:active{
+    scale: .8;
+}
+.showQuestion{
+    padding: 50px 10%;
+    display: flex;
+    justify-content: center;
+    font-size: 30px;
+    font-weight: bold;
+    gap: 25px;
+}
+.questionNo{
+    color: #0ef;
+}
+.question{
+    color: #fff;
+}
+.timer{
+    display: flex;
+    justify-content: end;
+    span{
+        height: 60px;
+        width: 60px;
+        border-radius: 50%;
+        border: 5px solid #0ef;
+        margin-right: 100px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        color: #0ef;
+        font-size: 30px;
+        font-weight: bold;
+    }
+}
+.options{
+    padding: 30px 10%;
+}
+.option {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    padding: 10px 0;
+}
+.option div {
+    width: 50%;
+    border: 2px solid #0ef;
+    border-radius: 15px;
+    padding: 15px 50px;
+    font-size: 25px;
+    text-align: left;
+    color: #0ef;
+    cursor: pointer;
+    transition: .3s;
+}
+.option div:hover{
+    box-shadow: 0 0 11px 2px #0ef;
+}
+.option div:active{
+    box-shadow: 0 0 11px 2px #0ef;
+    background-color: #0ef;
+    color: #081b29;
+}

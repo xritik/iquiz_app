@@ -1,10 +1,10 @@
 import React from 'react'
 
-const Home = ({navigate}) => {
+const Home = ({navigate, setShowSignUp}) => {
 
-  const handleLogin = () => {
-    navigate('/login_signUp')
-  }
+  // const handleLogin = () => {
+  //   navigate('/login_signUp')
+  // }
 
   return (
     <div className='homeSection'>
@@ -13,13 +13,13 @@ const Home = ({navigate}) => {
           <div className='nav1'><span className='bName1'>IQ</span><span className='bName2'>uiz</span></div>
           <div className='nav2'></div>
           <div className='nav3'>
-          <button className='loginButton' onClick={handleLogin}>Login</button>
-          <button className='signupButton'>Sign-up</button>
+          <button className='loginButton' onClick={() => {setShowSignUp(false); navigate('/login_signUp')}}>Login</button>
+          <button className='signupButton loginButton ' onClick={() => {setShowSignUp(true); navigate('/login_signUp')}}>Sign-up</button>
           </div>
         </div>
       </nav>
       <div className='homePage'>
-        <form className='homePageForm'>
+        <form className='homePageForm' onSubmit={(e) => { e.preventDefault(); navigate('/in_game')}}>
           <p></p>
           <input
             type='text'
@@ -32,8 +32,8 @@ const Home = ({navigate}) => {
             required
             placeholder='Enter your game pin'
           />
-          <button className='loginButton'>Join</button>
-          <p style={{marginTop:'30px'}}>*Login/Sign-up here to create your own quiz.</p>
+          <button className='loginButton' type='submit'>Join</button>
+          <p style={{marginTop:'30px'}}>*<a onClick={() => {setShowSignUp(false); navigate('/login_signUp')}}>Login</a>/<a onClick={() => {setShowSignUp(true); navigate('/login_signUp')}}>Sign-up</a> here to create your own quiz.</p>
         </form>
       </div>
       <hr/>
