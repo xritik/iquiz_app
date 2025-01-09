@@ -3,7 +3,6 @@ import  Home  from './components/Home.js';
 import Login_Signup  from './components/Login_Signup.js';
 import Dashboard from './components/Dashboard.js';
 import { useState } from "react";
-import PlayingGameUserPage from "../../player_side/src/components/PlayingGameUserPage.js";
 
 function App() {
   const navigate = useNavigate();
@@ -16,7 +15,6 @@ function App() {
         <Route path={'/home'} element={<Home navigate={navigate} setShowSignUp={setShowSignUp} />} />
         <Route path={'/login_signUp'} element={<Login_Signup navigate={navigate} showSignUp={showSignUp} setShowSignUp={setShowSignUp} />} />
         <Route path={'/dashboard'} element={ <Dashboard navigate={navigate} /> }/>
-        <Route path={'/in_game'} element={ <PlayingGameUserPage navigate={navigate} /> } />
       </Routes>
     </div>
   );

@@ -2,9 +2,24 @@ import React from 'react'
 
 const Home = ({navigate, setShowSignUp}) => {
 
-  // const handleLogin = () => {
-  //   navigate('/login_signUp')
-  // }
+  const handleStartGame = async() => {
+    try {
+      const response = await fetch('http://localhost:5000/start-game', {
+        method: 'POST',
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        alert(result.message);
+        navigate('http://localhost:3001/');
+      } else {
+        alert('Failed to start IQuiz!');
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      alert('Error starting IQuiz!');
+    }
+  }
 
   return (
     <div className='homeSection'>
@@ -19,7 +34,7 @@ const Home = ({navigate, setShowSignUp}) => {
         </div>
       </nav>
       <div className='homePage'>
-        <form className='homePageForm' onSubmit={(e) => { e.preventDefault(); navigate('/in_game')}}>
+        <form className='homePageForm' onSubmit={(e) => { e.preventDefault(); handleStartGame()}}>
           <p></p>
           <input
             type='text'
