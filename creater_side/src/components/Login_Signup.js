@@ -1,8 +1,67 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { Link } from 'react-router-dom';
 import '../css/login_signup.css';
 
 const Login_Signup = ({navigate, showSignUp, setShowSignUp}) => {
+
+  const [name, setName] = useState('');
+  const [password, setPassword] = useState('');
+
+  const handleSignup = async () => {
+
+    try {
+      const response = await fetch('http://localhost:5000/signUp', {
+        method: 'POST',
+        headers:{
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ name, password })
+      });
+      const data = await response.json();
+      if(response.ok){
+        alert(data.message);
+        localStorage.setItem('IQuiz_loginName', name);
+        navigate('/home');
+      }else if(response.status === 409){
+        alert(data.message);
+      }else if(response.status === 500){
+          alert(data.message);
+      } else{
+          alert('Something went wrong, Please try again!!');
+      }
+    } catch (error) {
+      console.error(error);
+      alert('Something went wrong, Please try again!!');
+    }
+  }
+
+
+  const handleLogin = async () => {
+    try {
+      const response = await fetch('http://localhost:5000/login', {
+        method: 'POST',
+        headers:{
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ name, password })
+      });
+      const data = await response.json();
+      if(response.ok){
+        alert(data.message);
+        localStorage.setItem('IQuiz_loginName', name);
+        navigate('/home');
+      }else if(response.status === 401){
+        alert(data.message);
+      }else if(response.status === 500){
+          alert(data.message);
+      } else{
+          alert('Something went wrong, Please try again!!');
+      }
+    } catch (error) {
+      console.error(error);
+      alert('Something went wrong, Please try again!!');
+    }
+  }
 
   return (
     <div className='login-signup-section'>
@@ -13,17 +72,24 @@ const Login_Signup = ({navigate, showSignUp, setShowSignUp}) => {
 
         <div className='form-box login'>
           <h2 className='animation' style={{ "--i": 0, "--j":21 }}>Login</h2>
-          <form action='#'>
+          <form action='#' onSubmit={(e) => {e.preventDefault(); handleLogin()}}>
             <div className='input-box animation' style={{ "--i": 1, "--j":22 }}>
               <input 
-                type='text' 
+                type='text'
                 required
+                value={name}
+                onChange={(e) => setName(e.target.value)}
               />
               <label>Username</label>
               <i className='bx bxs-user'></i>
             </div>
             <div className='input-box animation' style={{ "--i": 2, "--j":23 }}>
-              <input type='password' required/>
+              <input 
+                type='password' 
+                required
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+              />
               <label>Password</label>
               <i className='bx bxs-lock-alt'></i>
             </div>
@@ -40,17 +106,24 @@ const Login_Signup = ({navigate, showSignUp, setShowSignUp}) => {
 
         <div className='form-box register'>
           <h2 className='animation' style={{ "--i": 17, "--j":0 }}>Sign Up</h2>
-          <form action='#'>
+          <form action='#' onSubmit={(e) => {e.preventDefault(); handleSignup()}}>
             <div className='input-box animation' style={{ "--i": 18, "--j":1 }}>
               <input 
                 type='text' 
                 required
+                value={name}
+                onChange={(e) => setName(e.target.value)}
               />
               <label>Username</label>
               <i className='bx bxs-user'></i>
             </div>
             <div className='input-box animation' style={{ "--i": 19, "--j":2 }}>
-              <input type='password' required/>
+              <input 
+                type='password' 
+                required
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+              />
               <label>Password</label>
               <i className='bx bxs-lock-alt'></i>
             </div>

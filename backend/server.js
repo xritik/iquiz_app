@@ -13,10 +13,14 @@ app.use(cors(corsOptions));
 app.use(express.json());
 
 
-const gameRoutes = require('./routes/WebRunningRoutes');
+const signupRoute = require('./routes/SignupRoutes');
+const loginRoute = require('./routes/LoginRoutes');
+const gameRoute = require('./routes/WebRunningRoutes');
 
-
-app.use('/start-game', gameRoutes);
+            
+app.use('/signUp', signupRoute);
+app.use('/login', loginRoute);
+app.use('/start-game', gameRoute);
 
 
 app.listen(PORT, () => console.log('Server is running at port ', PORT));

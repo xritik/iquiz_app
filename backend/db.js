@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const mongoURL = 'mongodb://localhost:27017/mytraining';
+const mongoURL = 'mongodb://localhost:27017/iquiz';
 
 mongoose.connect(mongoURL);
 
