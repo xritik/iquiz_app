@@ -89,7 +89,7 @@ const Home = ({navigate, setShowSignUp}) => {
       </div>
 
       <div className='createIQuizButtons'>
-        <button className='btn'>Create a IQuiz</button>
+        <button className='btn' onClick={() => {navigate(`${loggedinUser ? '/adding_iquiz' : '/login_signUp'}`)}}>Create a IQuiz</button>
       </div>
 
       <hr/>
