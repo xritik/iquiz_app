@@ -1,3 +1,190 @@
+*{
+    scroll-behavior: smooth;
+}
 .iquizCreationSection{
+    min-height: 100vh;
+    width: 100vw;
     background: #081b29;
+    display: flex;
+}
+.iquizCreationPart1{
+    width: 200px;
+    height: 100vh;
+    padding-top: 30px;
+    gap: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    overflow-y: auto;
+    scrollbar-width: none;
+}
+.questions{
+    min-height: 90px;
+    width: 150px;
+    border: 1px solid #ccc;
+    border-radius: 7px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    color: #ccc;
+    font-weight: bold;
+    font-size: 18px;
+    transition: .5s;
+}
+.questions:hover{
+    color: #0ef;
+}
+.questions:active{
+    scale: .9;
+    border-color: #0ef;
+    box-shadow: 0 0 25px 3px #0ef;
+}
+.addMoreBtn{
+    border: 1px solid #0ef;
+    padding: 10px 20px;
+    margin-top: 7px;
+    border-radius: 20px;
+    cursor: pointer;
+    color: #fff;
+    font-weight: bold;
+    transition: .3s;
+}
+.addMoreBtn:hover{
+    box-shadow: 0 0 10px 1px #0ef;
+}
+.addMoreBtn:active{
+    background: #0ef;
+    color: #081b29;
+    scale: .9;
+}
+.iquizCreationPart2{
+    width: calc(100vw - 200px);
+    border-left: 1px solid gray;
+}
+.addingIQuizForm{
+    width: 100%;
+    height: 100%;
+}
+.title_button{
+    width: 100%;
+    display: flex;
+    padding: 30px 100px;
+}
+.title_button .part1{
+    height: 40px;
+    width: 40%;
+    input{
+        height: 100%;
+        width: 100%;
+        background: #103855;
+        font-size: 20px;
+        padding-left: 10px;
+        color: #ccc;
+    }
+}
+.title_button .part2{
+    position: absolute;
+    right: 100px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    button{
+        font-size: 20px;
+        font-weight: bold;
+        padding: 5px 20px 5px 20px;
+        border-radius: 5px;
+        border: none;
+        cursor: pointer;
+        color: #081b29;
+        transition: .4s;
+    }
+}
+.title_button .part2 button:hover{
+    background: #0ef;
+    box-shadow: 0 0 15px 3px #0ef;
+}
+.title_button .part2 button:active{
+    scale: .8;
+}
+.question_timer{
+    width: 100%;
+    display: flex;
+    padding-top: 10px;
+}
+.question_timer .part1{
+    width: 15%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-size: 35px;
+    font-weight: bold;
+}
+.question_timer .part2{
+    height: auto;
+    width: 65%;
+    textarea{
+        width: 100%;
+        font-size: 25px;
+        padding: 5px 10px;
+        font-weight: bold;
+        color: #ccc;
+        background: transparent;
+        outline: none;
+        border: 1px solid #fff;
+        border-radius: 7px;
+        height: auto;
+        resize: none;
+    }
+}
+.question_timer .part3{
+    width: 20%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    select{
+        font-size: 15px;
+        padding: 5px 15px 5px 15px;
+        border-radius: 5px;
+        outline: none;
+        border: none;
+        cursor: pointer;
+        color: #081b29;
+        transition: .4s;
+    }
+}
+.options{
+    padding: 80px 10%;
+}
+.option {
+    display: flex;
+    justify-content: center;
+    gap: 50px;
+    padding: 20px 0;
+}
+.option div {
+    width: 50%;
+    border: 2px solid #0ef;
+    border-radius: 15px;
+    /* padding: 15px 50px; */
+    font-size: 25px;
+    text-align: left;
+    color: #0ef;
+    textarea{
+        width: 100%;
+        height: 100%;
+        font-size: 18px;
+        padding: 7px;
+        border: none;
+        background: transparent;
+        color: #fff;
+        overflow-y: scroll;
+        scrollbar-width: none;
+        outline: none;
+        resize: none;
+        /* overflow: hidden; */
+        /* white-space: pre-wrap; */
+        /* word-wrap: break-word; */
+    }
 }
