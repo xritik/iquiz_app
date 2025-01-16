@@ -41,6 +41,12 @@ const IQuizCreationPage = () => {
           question: "",
           timer: "",
           options: ["", "", "", ""], 
+          // options: [
+          //     { text: "", isCorrect: false },
+          //     { text: "", isCorrect: false },
+          //     { text: "", isCorrect: false },
+          //     { text: "", isCorrect: false }
+          // ],
         });
         const quiz = {
             title: iquizTitle,
