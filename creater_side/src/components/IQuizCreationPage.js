@@ -18,6 +18,7 @@ const IQuizCreationPage = () => {
     });
 
     const handleSave = () => {
+        setIquizQuestions([...iquizQuestions, currentQuestion]);
         const quiz = {
             title: iquizTitle,
             iquizQuestions,
