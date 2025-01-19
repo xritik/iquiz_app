@@ -1,3 +1,5 @@
+@import url('https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css');
+
 *{
     scroll-behavior: smooth;
 }
@@ -154,37 +156,63 @@
         transition: .4s;
     }
 }
-.options{
+.optionSection{
     padding: 80px 10%;
 }
-.option {
+.options {
     display: flex;
     justify-content: center;
     gap: 50px;
     padding: 20px 0;
 }
-.option div {
+.option {
     width: 50%;
+    display: flex;
     border: 2px solid #0ef;
     border-radius: 15px;
     /* padding: 15px 50px; */
     font-size: 25px;
     text-align: left;
     color: #0ef;
-    textarea{
-        width: 100%;
-        height: 100%;
-        font-size: 18px;
-        padding: 7px;
-        border: none;
-        background: transparent;
-        color: #fff;
-        overflow-y: scroll;
-        scrollbar-width: none;
-        outline: none;
-        resize: none;
-        /* overflow: hidden; */
-        /* white-space: pre-wrap; */
-        /* word-wrap: break-word; */
-    }
+}
+.option textarea{
+    width: 90%;
+    height: 100%;
+    font-size: 18px;
+    padding: 7px;
+    border: none;
+    background: transparent;
+    color: #fff;
+    overflow-y: scroll;
+    scrollbar-width: none;
+    outline: none;
+    resize: none;
+    /* overflow: hidden; */
+    /* white-space: pre-wrap; */
+    /* word-wrap: break-word; */
+}
+.selectOption{
+    width: 10%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 45px;
+    color: #164d75;
+    cursor: pointer;
+    transition: .3s;
+}
+.selectOption:hover{
+    color: #0ef;
+}
+.selectOption:active{
+    scale: .8;
+    text-shadow: 0 0 7px #0ef;
+}
+.brightText{
+    color: #0ef;
+    /* text-shadow: 0 0 7px #0ef; */
+}
+.normalText{
+    color: #164d75;
 }

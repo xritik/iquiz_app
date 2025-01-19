@@ -1,61 +1,66 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import '../css/iquiz_creation_page.css'
 
 const IQuizCreationPage = () => {
-    const [iquiz, setIquiz] = useState([]);
+    const [iquiz, setIquiz] = useState({
+        title: '',
+        iquizQuestions: [],
+    });
     const [iquizTitle, setIquizTitle] = useState('');
-    const [iquizQuestions, setIquizQuestions] = useState('');
+    const [iquizQuestions, setIquizQuestions] = useState([]);
     const [currentQuestion, setCurrentQuestion] = useState({
         question: "",
         timer: "",
-        options: ["", "", "", ""],
-        // options: [
-        //     { text: "", isCorrect: false },
-        //     { text: "", isCorrect: false },
-        //     { text: "", isCorrect: false },
-        //     { text: "", isCorrect: false }
-        // ],
+        // options: ["", "", "", ""],
+        options: [
+            { text: "", isCorrect: false },
+            { text: "", isCorrect: false },
+            { text: "", isCorrect: false },
+            { text: "", isCorrect: false }
+        ],
     });
 
     const handleSave = () => {
-        setIquizQuestions([...iquizQuestions, currentQuestion]);
-        const quiz = {
-            title: iquizTitle,
-            iquizQuestions,
-        };
-        console.log("Quiz Data:", quiz);
+        iquizQuestions.push(currentQuestion)
+        console.log("Quiz Data:", iquiz);
         alert("Quiz saved! Check console for details.");
-        // Reset form
-        setIquizTitle("");
-        setIquizQuestions([]);
     };
 
     const handleOptionChange = (index, value) => {
         const updatedOptions = [...currentQuestion.options];
-        updatedOptions[index] = value;
+        updatedOptions[index].text = value;
         setCurrentQuestion({ ...currentQuestion, options: updatedOptions });
     };
 
+    const handleSetCorrectOption = (index, value) => {
+        const updatedOptions = [...currentQuestion.options];
+        updatedOptions[index].isCorrect = !value;
+        setCurrentQuestion({ ...currentQuestion, options: updatedOptions });
+    }
+
     const addQuestion = () => {
-        setIquizQuestions([...iquizQuestions, currentQuestion]);
+        iquizQuestions.push(currentQuestion)
         setCurrentQuestion({
           question: "",
           timer: "",
-          options: ["", "", "", ""], 
-          // options: [
-          //     { text: "", isCorrect: false },
-          //     { text: "", isCorrect: false },
-          //     { text: "", isCorrect: false },
-          //     { text: "", isCorrect: false }
-          // ],
+        //   options: ["", "", "", ""], 
+          options: [
+            { text: "", isCorrect: false },
+            { text: "", isCorrect: false },
+            { text: "", isCorrect: false },
+            { text: "", isCorrect: false }
+          ],
         });
-        const quiz = {
-            title: iquizTitle,
-            iquizQuestions,
-        };
-        console.log("Quiz Data:", quiz);
+        console.log("Quiz Data:", iquiz);
     };
 
+    useEffect(() => {
+        setIquiz({
+            title: iquizTitle,
+            iquizQuestions,
+        });
+    }, [ iquizTitle, iquizQuestions ] )
+      
   return (
     <div className='iquizCreationSection'>
         <div className='iquizCreationPart1'>
@@ -94,6 +99,7 @@ const IQuizCreationPage = () => {
                     </div>
                     <div className='part3'>
                         <select value={currentQuestion.timer} onChange={(e) => setCurrentQuestion({ ...currentQuestion, timer: e.target.value })}>
+                            <option value={''}>Select time</option>
                             <option value={'10'}>10 second</option>
                             <option value={'20'}>20 second</option>
                             <option value={'30'}>30 second</option>
@@ -101,41 +107,53 @@ const IQuizCreationPage = () => {
                     </div>
                 </div>
 
-                <div className='options'>
-                    <div className='option'>
-                        <div>
+                <div className='optionSection'>
+                    <div className='options'>
+                        <div className='option'>
                             <textarea 
                                 required 
                                 placeholder='Enter your first option'
-                                value={currentQuestion.options[0]}
+                                value={currentQuestion.options[0].text}
                                 onChange={(e) => handleOptionChange(0, e.target.value)}
                             />
+                            <div className='selectOption'>
+                                <i onClick={(e) => handleSetCorrectOption(0, currentQuestion.options[0].isCorrect)} className={`bx ${currentQuestion.options[0].isCorrect ? 'bxs-check-circle brightText' : 'bx-circle normalText' }`}></i>
+                            </div>
                         </div>
-                        <div>
+                        <div className='option'>
                             <textarea 
                                 required 
                                 placeholder='Enter your second option'
-                                value={currentQuestion.options[1]}
+                                value={currentQuestion.options[1].text}
                                 onChange={(e) => handleOptionChange(1, e.target.value)}
                             />
+                            <div className='selectOption'>
+                                <i onClick={(e) => handleSetCorrectOption(1, currentQuestion.options[1].isCorrect)} className={`bx ${currentQuestion.options[1].isCorrect ? 'bxs-check-circle brightText' : 'bx-circle normalText' }`}></i>
+                            </div>
                         </div>
                     </div>
-                    <div className='option'>
-                        <div>
+                    <div className='options'>
+                        <div className='option'>
                             <textarea 
                                 required 
                                 placeholder='Enter your third option'
-                                value={currentQuestion.options[2]}
+                                value={currentQuestion.options[2].text}
                                 onChange={(e) => handleOptionChange(2, e.target.value)}
                             />
+                            <div className='selectOption'>
+                                <i onClick={(e) => handleSetCorrectOption(2, currentQuestion.options[2].isCorrect)} className={`bx ${currentQuestion.options[2].isCorrect ? 'bxs-check-circle brightText' : 'bx-circle normalText' }`}></i>
+                            </div>
                         </div>
-                        <div>
+                        <div className='option'>
                             <textarea 
                                 required 
                                 placeholder='Enter your fourth option'
-                                value={currentQuestion.options[3]}
+                                value={currentQuestion.options[3].text}
                                 onChange={(e) => handleOptionChange(3, e.target.value)}
                             />
+                            <div className='selectOption'>
+                                <i onClick={(e) => handleSetCorrectOption(3, currentQuestion.options[3].isCorrect)} className={`bx ${currentQuestion.options[3].isCorrect ? 'bxs-check-circle brightText' : 'bx-circle normalText' }`}></i>
+                            </div>
                         </div>
                     </div>
                 </div>
