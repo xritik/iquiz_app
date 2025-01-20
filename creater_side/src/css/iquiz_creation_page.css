@@ -13,7 +13,7 @@
     width: 200px;
     height: 100vh;
     padding-top: 30px;
-    gap: 10px;
+    gap: 15px;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -21,6 +21,11 @@
     scrollbar-width: none;
 }
 .questions{
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+.question{
     min-height: 90px;
     width: 150px;
     border: 1px solid #ccc;
@@ -34,10 +39,10 @@
     font-size: 18px;
     transition: .5s;
 }
-.questions:hover{
+.question:hover{
     color: #0ef;
 }
-.questions:active{
+.question:active{
     scale: .9;
     border-color: #0ef;
     box-shadow: 0 0 25px 3px #0ef;
@@ -201,8 +206,11 @@
     color: #164d75;
     cursor: pointer;
     transition: .3s;
+    i{
+        transition: .3s;
+    }
 }
-.selectOption:hover{
+.selectOption:hover > i{
     color: #0ef;
 }
 .selectOption:active{
