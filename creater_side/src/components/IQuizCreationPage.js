@@ -1,210 +1,166 @@
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react';
 import '../css/iquiz_creation_page.css'
 
-const IQuizCreationPage = () => {
-    const [iquiz, setIquiz] = useState({
-        title: '',
-        iquizQuestions: [],
-    });
-    const [iquizTitle, setIquizTitle] = useState('');
-    const [iquizQuestions, setIquizQuestions] = useState([]);
-    const [currentQuestion, setCurrentQuestion] = useState({
-        question: "",
-        timer: "",
-        options: [
-            { text: "", isCorrect: false },
-            { text: "", isCorrect: false },
-            { text: "", isCorrect: false },
-            { text: "", isCorrect: false }
-        ],
-    });
-    console.log(iquiz)
+const QuizCreation = () => {
+  const [iquizTitle, setIquizTitle] = useState('');
+  const [iquizQuestions, setIquizQuestions] = useState([
+    {
+      question: '',
+      timer: '',
+      options: [
+        { text: '', isCorrect: false },
+        { text: '', isCorrect: false },
+        { text: '', isCorrect: false },
+        { text: '', isCorrect: false },
+      ],
+    },
+  ]);
+  const [currentQuestion, setCurrentQuestion] = useState(0);
+  
+  console.log(iquizQuestions);
 
-    const handleQuestionChange = (e) => {
-        setCurrentQuestion((prevState) => ({
-            ...prevState,
-            question: e.target.value,
-        }));
+  const handleQuestionChange = (index, value) => {
+    const updatedQuestions = [...iquizQuestions];
+    updatedQuestions[index].question = value;
+    setIquizQuestions(updatedQuestions);
+  };
+
+  const handleTimerChange = (index, value) => {
+    const updatedQuestions = [...iquizQuestions];
+    updatedQuestions[index].timer = value;
+    setIquizQuestions(updatedQuestions);
+  };
+
+  const handleOptionChange = (qIndex, oIndex, value) => {
+    const updatedQuestions = [...iquizQuestions];
+    updatedQuestions[qIndex].options[oIndex].text = value;
+    setIquizQuestions(updatedQuestions);
+  };
+
+  const handleSetCorrectOption = (qIndex, oIndex) => {
+    const updatedQuestions = [...iquizQuestions];
+    updatedQuestions[qIndex].options = updatedQuestions[qIndex].options.map((option, index) => ({
+      ...option,
+      isCorrect: index === oIndex,
+    }));
+    setIquizQuestions(updatedQuestions);
+  };
+
+  const addEmptyQuestion = () => {
+    const newQuestion = {
+      question: '',
+      timer: '',
+      options: [
+        { text: '', isCorrect: false },
+        { text: '', isCorrect: false },
+        { text: '', isCorrect: false },
+        { text: '', isCorrect: false },
+      ],
     };
-      
-    const handleTimerChange = (e) => {
-        setCurrentQuestion((prevState) => ({
-            ...prevState,
-            timer: e.target.value,
-        }));
-    };
-    
-    
-    const handleOptionChange = (index, value) => {
-        const updatedOptions = [...currentQuestion.options];
-        updatedOptions[index].text = value;
-        setCurrentQuestion({ ...currentQuestion, options: updatedOptions });
-    };
-    
-    const handleSetCorrectOption = (index, value) => {
-        const updatedOptions = [...currentQuestion.options];
-        updatedOptions[index].isCorrect = !value;
-        setCurrentQuestion({ ...currentQuestion, options: updatedOptions });
-    }
-    
-    const addQuestion = () => {
-        // iquizQuestions.push(currentQuestion)
-        setIquizQuestions((prevQuestions) => [...prevQuestions, { ...currentQuestion }]);
-        setCurrentQuestion({
-          question: "",
-          timer: "",
-            options: [
-                { text: "", isCorrect: false },
-                { text: "", isCorrect: false },
-                { text: "", isCorrect: false },
-                { text: "", isCorrect: false }
-            ],
-        });
-        console.log("Quiz Data:", iquiz);
-    };
+    setIquizQuestions([...iquizQuestions, newQuestion]);
+    setCurrentQuestion(iquizQuestions.length); // Focus on the new question
+  };
 
-    const selectQuestion = (index) => {
-        setCurrentQuestion(iquizQuestions[index])
-    }
+  const handleSave = () => {
+    const quizData = { title: iquizTitle, questions: iquizQuestions };
+    console.log(quizData);
+    alert('Quiz saved successfully!');
+  };
 
-    const handleEmpty =() => {
-        setCurrentQuestion({
-            question: "",
-            timer: "",
-            options: [
-              { text: "", isCorrect: false },
-              { text: "", isCorrect: false },
-              { text: "", isCorrect: false },
-              { text: "", isCorrect: false }
-            ],
-        });
-    }
-
-    const handleSave = () => {
-        // iquizQuestions.push(currentQuestion);
-        setIquizQuestions((prevQuestions) => [...prevQuestions, { ...currentQuestion }]);
-        const finalQuiz = {
-            title: iquizTitle,
-            iquizQuestions,
-        };
-
-        setIquiz(finalQuiz);
-        console.log('Quiz Data:', finalQuiz);
-        alert('Quiz saved! Check console for details.');
-    };
-
-    useEffect(() => {
-        setIquiz({
-            title: iquizTitle,
-            iquizQuestions,
-        });
-    }, [ iquizTitle, iquizQuestions ] );
-      
   return (
-    <div className='iquizCreationSection'>
-        <div className='iquizCreationPart1'>
-
-        {iquiz.iquizQuestions.map((quiz, index) => (
-            <div key={index} className='questions'>
-                <div onClick={() => selectQuestion(index)} className='question'>Question {index+1}</div>
+    <div className="iquizCreationSection">
+      <div className="iquizCreationPart1">
+        {iquizQuestions.map((quiz, index) => (
+          <div key={index} className="questions">
+            <div onClick={() => setCurrentQuestion(index)} className="question">
+              Question {index + 1}
             </div>
+          </div>
         ))}
-            <div onClick={handleEmpty} className='question'>Current Ques.</div>
-            <div className='addMoreBtn' onClick={addQuestion}>Add more</div>
+        <div onClick={addEmptyQuestion} className="addMoreBtn">
+          Add More
         </div>
-        <div className='iquizCreationPart2'>
-            <form className='addingIQuizForm' onSubmit={(e) => {e.preventDefault(); handleSave()}}>
-                <div className='title_button'>
-                    {/* <div className='part1'></div> */}
-                    <div className='part1'>
-                        <input
-                            type='text'
-                            required
-                            placeholder='Title for your IQuiz'
-                            value={iquizTitle}
-                            onChange={(e) => setIquizTitle(e.target.value)}
-                        />
-                    </div>
-                    <div className='part2'>
-                        <button>Save</button>
-                    </div>
-                </div>
-                <div className='question_timer'>
-                    <div className='part1'>1</div>
-                    <div className='part2'>
-                        <textarea
-                            type='text'
-                            required
-                            placeholder='Type your question'
-                            value={currentQuestion.question}
-                            onChange={handleQuestionChange}
-                        />
-                    </div>
-                    <div className='part3'>
-                        <select value={currentQuestion.timer} onChange={handleTimerChange}>
-                            <option value={''}>Select time</option>
-                            <option value={'10'}>10 second</option>
-                            <option value={'20'}>20 second</option>
-                            <option value={'30'}>30 second</option>
-                        </select>
-                    </div>
-                </div>
+      </div>
 
-                <div className='optionSection'>
-                    <div className='options'>
-                        <div className='option'>
-                            <textarea 
-                                required 
-                                placeholder='Enter your first option'
-                                value={currentQuestion.options[0].text}
-                                onChange={(e) => handleOptionChange(0, e.target.value)}
-                            />
-                            <div className='selectOption'>
-                                <i onClick={() => handleSetCorrectOption(0, currentQuestion.options[0].isCorrect)} className={`bx ${currentQuestion.options[0].isCorrect ? 'bxs-check-circle brightText' : 'bx-circle normalText' }`}></i>
-                            </div>
-                        </div>
-                        <div className='option'>
-                            <textarea 
-                                required 
-                                placeholder='Enter your second option'
-                                value={currentQuestion.options[1].text}
-                                onChange={(e) => handleOptionChange(1, e.target.value)}
-                            />
-                            <div className='selectOption'>
-                                <i onClick={() => handleSetCorrectOption(1, currentQuestion.options[1].isCorrect)} className={`bx ${currentQuestion.options[1].isCorrect ? 'bxs-check-circle brightText' : 'bx-circle normalText' }`}></i>
-                            </div>
-                        </div>
-                    </div>
-                    <div className='options'>
-                        <div className='option'>
-                            <textarea 
-                                required 
-                                placeholder='Enter your third option'
-                                value={currentQuestion.options[2].text}
-                                onChange={(e) => handleOptionChange(2, e.target.value)}
-                            />
-                            <div className='selectOption'>
-                                <i onClick={() => handleSetCorrectOption(2, currentQuestion.options[2].isCorrect)} className={`bx ${currentQuestion.options[2].isCorrect ? 'bxs-check-circle brightText' : 'bx-circle normalText' }`}></i>
-                            </div>
-                        </div>
-                        <div className='option'>
-                            <textarea 
-                                required 
-                                placeholder='Enter your fourth option'
-                                value={currentQuestion.options[3].text}
-                                onChange={(e) => handleOptionChange(3, e.target.value)}
-                            />
-                            <div className='selectOption'>
-                                <i onClick={() => handleSetCorrectOption(3, currentQuestion.options[3].isCorrect)} className={`bx ${currentQuestion.options[3].isCorrect ? 'bxs-check-circle brightText' : 'bx-circle normalText' }`}></i>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+      <div className="iquizCreationPart2">
+        <form
+          className="addingIQuizForm"
+          onSubmit={(e) => {
+            e.preventDefault();
+            handleSave();
+          }}
+        >
+          <div className="title_button">
+            <div className="part1">
+              <input
+                type="text"
+                required
+                placeholder="Title for your IQuiz"
+                value={iquizTitle}
+                onChange={(e) => setIquizTitle(e.target.value)}
+              />
+            </div>
+            <div className="part2">
+              <button type="submit">Save Quiz</button>
+            </div>
+          </div>
 
-            </form>
-        </div>
+          {currentQuestion !== null && (
+            <div>
+              <div className="question_timer">
+                <div className="part1">Q{currentQuestion + 1}</div>
+                <div className="part2">
+                  <textarea
+                    type="text"
+                    required
+                    placeholder="Type your question"
+                    value={iquizQuestions[currentQuestion].question}
+                    onChange={(e) => handleQuestionChange(currentQuestion, e.target.value)}
+                  />
+                </div>
+                <div className="part3">
+                  <select
+                    value={iquizQuestions[currentQuestion].timer}
+                    onChange={(e) => handleTimerChange(currentQuestion, e.target.value)}
+                  >
+                    <option value="">Select time</option>
+                    <option value="10">10 seconds</option>
+                    <option value="20">20 seconds</option>
+                    <option value="30">30 seconds</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="optionSection">
+                <div className="options">
+                  {iquizQuestions[currentQuestion].options.map((option, oIndex) => (
+                    <div key={oIndex} className="option">
+                      <textarea
+                        required
+                        placeholder={`Enter option ${oIndex + 1}`}
+                        value={option.text}
+                        onChange={(e) => handleOptionChange(currentQuestion, oIndex, e.target.value)}
+                      />
+                      <div className="selectOption">
+                        <i
+                          onClick={() => handleSetCorrectOption(currentQuestion, oIndex)}
+                          className={`bx ${
+                            option.isCorrect
+                              ? 'bxs-check-circle brightText'
+                              : 'bx-circle normalText'
+                          }`}
+                        ></i>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
+        </form>
+      </div>
     </div>
-  )
-}
+  );
+};
 
-export default IQuizCreationPage;
+export default QuizCreation;
