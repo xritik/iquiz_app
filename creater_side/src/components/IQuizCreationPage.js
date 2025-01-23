@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import '../css/iquiz_creation_page.css'
 
-const QuizCreation = () => {
+const QuizCreation = ({ navigate }) => {
   const [iquizTitle, setIquizTitle] = useState('');
   const [iquizQuestions, setIquizQuestions] = useState([
     {
@@ -16,8 +16,25 @@ const QuizCreation = () => {
     },
   ]);
   const [currentQuestion, setCurrentQuestion] = useState(0);
+  const [emptyFields, setEmptyFields] = useState([]);
   
-  console.log(iquizQuestions);
+  
+//   console.log(iquizQuestions);
+//   console.log(emptyFields)
+
+  useEffect(() => {
+    for(let i=1; i<=(iquizQuestions.length); i++ ){
+        // console.log(i)
+        setEmptyFields([...emptyFields,
+            {
+                question: false,
+                timer: false,
+                options: false,
+                currectOption: false,
+            }
+        ]);
+    }
+  }, [iquizQuestions.length])
 
   const handleQuestionChange = (index, value) => {
     const updatedQuestions = [...iquizQuestions];
@@ -55,17 +72,31 @@ const QuizCreation = () => {
       ],
     };
     setIquizQuestions([...iquizQuestions, newQuestion]);
-    setCurrentQuestion(iquizQuestions.length); // Focus on the new question
+    setCurrentQuestion(iquizQuestions.length);
   };
 
   const handleSave = () => {
-    const quizData = { title: iquizTitle, questions: iquizQuestions };
-    console.log(quizData);
-    alert('Quiz saved successfully!');
+    const updatedIQuiz = emptyFields.map((quiz, index) => ({
+        ...quiz,
+        question: iquizQuestions[index].question.trim().length < 1,
+        timer: iquizQuestions[index].timer.trim().length < 1,
+        options: iquizQuestions[index].options.some((option) => option.text.trim().length < 1 ),
+        currectOption: !(iquizQuestions[index].options.some((option) => option.isCorrect === true ))
+    }));
+
+    setEmptyFields(updatedIQuiz)
+    console.log(updatedIQuiz)
+
+    // const quizData = { title: iquizTitle, questions: iquizQuestions };
+    // console.log(quizData);
+    // alert('Quiz saved successfully!');
   };
 
   return (
     <div className="iquizCreationSection">
+        <div className='popupSection'>
+            <div className='popupCard'></div>
+        </div>
       <div className="iquizCreationPart1">
         {iquizQuestions.map((quiz, index) => (
           <div key={index} className="questions">
@@ -80,6 +111,7 @@ const QuizCreation = () => {
       </div>
 
       <div className="iquizCreationPart2">
+      <i className='bx bx-arrow-back back_arrow back_arrow1' onClick={() => {navigate('/')}}></i>
         <form
           className="addingIQuizForm"
           onSubmit={(e) => {
@@ -173,7 +205,7 @@ const QuizCreation = () => {
                     <div className="option">
                       <textarea
                         required
-                        placeholder='Enter first option'
+                        placeholder='Enter third option'
                         value={iquizQuestions[currentQuestion].options[2].text}
                         onChange={(e) => handleOptionChange(2, currentQuestion, e.target.value)}
                       />
@@ -192,7 +224,7 @@ const QuizCreation = () => {
                     <div className="option">
                       <textarea
                         required
-                        placeholder='Enter second option'
+                        placeholder='Enter fourth option'
                         value={iquizQuestions[currentQuestion].options[3].text}
                         onChange={(e) => handleOptionChange(3, currentQuestion, e.target.value)}
                       />

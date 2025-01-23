@@ -14,7 +14,7 @@ function App() {
         <Route path={'/'} element={<Home navigate={navigate} setShowSignUp={setShowSignUp} />} />
         <Route path={'/home'} element={<Home navigate={navigate} setShowSignUp={setShowSignUp} />} />
         <Route path={'/login_signUp'} element={<Login_Signup navigate={navigate} showSignUp={showSignUp} setShowSignUp={setShowSignUp} />} />
-        <Route path={'/adding_iquiz'} element={<IQuizCreationPage/>} />
+        <Route path={'/adding_iquiz'} element={<IQuizCreationPage navigate={navigate} />} />
       </Routes>
     </div>
   );

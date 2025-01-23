@@ -65,7 +65,7 @@ const Login_Signup = ({navigate, showSignUp, setShowSignUp}) => {
 
   return (
     <div className='login-signup-section'>
-      <i class='bx bx-arrow-back back_arrow' onClick={() => {navigate('/')}}></i>
+      <i className='bx bx-arrow-back back_arrow' onClick={() => {navigate('/')}}></i>
       <div className={`wrapper ${showSignUp ? 'active' : ''} `}>
         <span className='bg-animate'></span>
         <span className='bg-animate2'></span>
