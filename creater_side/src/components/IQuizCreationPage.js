@@ -83,9 +83,8 @@ const QuizCreation = ({ navigate }) => {
         options: iquizQuestions[index].options.some((option) => option.text.trim().length < 1 ),
         currectOption: !(iquizQuestions[index].options.some((option) => option.isCorrect === true ))
     }));
-
-    setEmptyFields(updatedIQuiz)
-    console.log(updatedIQuiz)
+    setEmptyFields(updatedIQuiz);
+    console.log(updatedIQuiz);
 
     // const quizData = { title: iquizTitle, questions: iquizQuestions };
     // console.log(quizData);
@@ -95,7 +94,11 @@ const QuizCreation = ({ navigate }) => {
   return (
     <div className="iquizCreationSection">
         <div className='popupSection'>
-            <div className='popupCard'></div>
+            <div className='popupCard'>
+                <i className='bx bx-x cross cross1'></i>
+                <h1>This IQuiz can't be saved!</h1>
+                <p>All questions need to be completed before you can start saving.</p>
+            </div>
         </div>
       <div className="iquizCreationPart1">
         {iquizQuestions.map((quiz, index) => (
