@@ -16,25 +16,11 @@ const QuizCreation = ({ navigate }) => {
     },
   ]);
   const [currentQuestion, setCurrentQuestion] = useState(0);
-  const [emptyFields, setEmptyFields] = useState([]);
+  const [errorsState, setErrorsState] = useState([]);
+  const [crossClicked, setCrossClicked] = useState(false);
   
   
 //   console.log(iquizQuestions);
-//   console.log(emptyFields)
-
-  useEffect(() => {
-    for(let i=1; i<=(iquizQuestions.length); i++ ){
-        // console.log(i)
-        setEmptyFields([...emptyFields,
-            {
-                question: false,
-                timer: false,
-                options: false,
-                currectOption: false,
-            }
-        ]);
-    }
-  }, [iquizQuestions.length])
 
   const handleQuestionChange = (index, value) => {
     const updatedQuestions = [...iquizQuestions];
@@ -76,26 +62,44 @@ const QuizCreation = ({ navigate }) => {
   };
 
   const handleSave = () => {
-    const updatedIQuiz = emptyFields.map((quiz, index) => ({
-        ...quiz,
-        question: iquizQuestions[index].question.trim().length < 1,
-        timer: iquizQuestions[index].timer.trim().length < 1,
-        options: iquizQuestions[index].options.some((option) => option.text.trim().length < 1 ),
-        currectOption: !(iquizQuestions[index].options.some((option) => option.isCorrect === true ))
-    }));
-    setEmptyFields(updatedIQuiz);
-    console.log(updatedIQuiz);
+    const validationErrors = iquizQuestions.map((q, questionIndex) => {
+      const questionErrors = {
+        question: q.question.trim() === '' ? 'Question text is empty' : null,
+        timer: q.timer.trim() === '' ? 'Timer is empty' : null,
+        option: q.options.some((option) => option.text.trim() === '' ) ? 'Option is empty' : null,
+        currectOption: !q.options.some((option) => option.isCorrect) ? 'No correct option selected!' : null,
+      };
+      return questionErrors;
+    });
 
-    // const quizData = { title: iquizTitle, questions: iquizQuestions };
-    // console.log(quizData);
-    // alert('Quiz saved successfully!');
+    const filteredErrors = validationErrors.filter(
+      (error) => error.question || error.timer || error.option
+    );
+
+    setErrorsState(filteredErrors);
+    // console.log(filteredErrors);
+
+    if (filteredErrors.length === 0) {
+      const quizData = { title: iquizTitle, questions: iquizQuestions };
+      console.log('Quiz Data:', quizData);
+      alert('Quiz saved successfully!');
+    };
   };
+
+  useEffect(() => {
+    console.log(errorsState);
+  }, [ errorsState ]);
+
+  const handleClick = () => {
+    setCrossClicked(true);
+  }
+ 
 
   return (
     <div className="iquizCreationSection">
-        <div className='popupSection'>
+        <div className='popupSection' style={{display: `${(errorsState.length === 0 || crossClicked) ? 'none' : 'flex'}`}}>
             <div className='popupCard'>
-                <i className='bx bx-x cross cross1'></i>
+                <i className='bx bx-x cross cross1' onClick={handleClick}></i>
                 <h1>This IQuiz can't be saved!</h1>
                 <p>All questions need to be completed before you can start saving.</p>
             </div>
