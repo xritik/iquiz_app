@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import '../css/iquiz_creation_page.css'
 
 const QuizCreation = ({ navigate }) => {
@@ -61,7 +61,7 @@ const QuizCreation = ({ navigate }) => {
     setCurrentQuestion(iquizQuestions.length);
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     const validationErrors = iquizQuestions.map((q, questionIndex) => {
       const questionErrors = {
         question: q.question.trim() === '' ? 'Question text is empty' : null,
@@ -84,16 +84,41 @@ const QuizCreation = ({ navigate }) => {
     if (filteredErrors.length === 0) {
         setCrossClicked(false);
         const quizData = { title: iquizTitle, questions: iquizQuestions };
-        console.log('Quiz Data:', quizData);
-        alert('Quiz saved successfully!');
+
+        try{
+            const response = await fetch('http://localhost:5000/add_iquiz', {
+                method: 'POST',
+                headers:{
+                'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ quizData })
+            });
+                const data = await response.json();
+        if(response.ok){
+            console.log('Quiz Data:', quizData);
+            alert(data.message);
+            navigate('/home');
+        }else if(response.status === 400){
+            alert(data.message);
+        }else if(response.status === 500){
+            alert(data.message);
+        } else{
+            alert('Something went wrong, Please try again!!');
+        }
+        } catch (error) {
+            console.error(error);
+            alert('Something went wrong, Please try again!!');
+        }
+            // console.log('Quiz Data:', quizData);
+            // alert('Quiz saved successfully!');
     }else{
         setCrossClicked(true);
     }
   };
 
-  useEffect(() => {
-    console.log(errorsState);
-  }, [ errorsState ]);
+//   useEffect(() => {
+    console.log(iquizQuestions);
+//   }, [ errorsState ]);
 
   const handleClick = () => {
     setCrossClicked(false);
@@ -140,7 +165,7 @@ const QuizCreation = ({ navigate }) => {
                 Q{index + 1}.
                 <div className='mini_timer'>{quiz.timer==='' ? 'T' : quiz.timer}</div>
               </div>
-              <div className='mini_question'>{ quiz.question.trim().length==0 ? <div className='mini_box'></div> : (quiz.question.length > 18 ? quiz.question.slice(0, 18)+'...' : quiz.question) }</div>
+              <div className='mini_question'>{ quiz.question.trim().length===0 ? <div className='mini_box'></div> : (quiz.question.length > 18 ? quiz.question.slice(0, 18)+'...' : quiz.question) }</div>
               <div className='mini_options'>
                 <div className='mini_option'>
                     {quiz.options[0].isCorrect && <div className='mini_correctOption'></div>}
