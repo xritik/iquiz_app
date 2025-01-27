@@ -73,17 +73,22 @@ const QuizCreation = ({ navigate }) => {
     });
 
     const filteredErrors = validationErrors.filter(
-      (error) => error.question || error.timer || error.option
+      (error) => error.question || error.timer || error.option  || error.currectOption
     );
-
-    setErrorsState(filteredErrors);
+    // setErrorsState(filteredErrors);
     // console.log(filteredErrors);
 
+    setErrorsState(validationErrors);
+    console.log(validationErrors);
+
     if (filteredErrors.length === 0) {
-      const quizData = { title: iquizTitle, questions: iquizQuestions };
-      console.log('Quiz Data:', quizData);
-      alert('Quiz saved successfully!');
-    };
+        setCrossClicked(false);
+        const quizData = { title: iquizTitle, questions: iquizQuestions };
+        console.log('Quiz Data:', quizData);
+        alert('Quiz saved successfully!');
+    }else{
+        setCrossClicked(true);
+    }
   };
 
   useEffect(() => {
@@ -91,24 +96,67 @@ const QuizCreation = ({ navigate }) => {
   }, [ errorsState ]);
 
   const handleClick = () => {
-    setCrossClicked(true);
+    setCrossClicked(false);
   }
  
 
   return (
     <div className="iquizCreationSection">
-        <div className='popupSection' style={{display: `${(errorsState.length === 0 || crossClicked) ? 'none' : 'flex'}`}}>
+        <div className='popupSection' style={{display: `${ crossClicked ? 'flex' : 'none'}`}}>
             <div className='popupCard'>
                 <i className='bx bx-x cross cross1' onClick={handleClick}></i>
                 <h1>This IQuiz can't be saved!</h1>
                 <p>All questions need to be completed before you can start saving.</p>
+                {errorsState.map((items, i) =>{
+                    if (
+                        items.question === null &&
+                        items.timer === null &&
+                        items.option === null &&
+                        items.currectOption === null
+                    ) {
+                        return null;
+                    }
+                    return(
+                        <div className="emptySection" key={i}>
+                            <div className="emptyQue_no">Q{i + 1}.</div>
+                            <div className="emptyQuestions">
+                                <ul>
+                                    {items.question && <li>{items.question}</li>}
+                                    {items.timer && <li>{items.timer}</li>}
+                                    {items.option && <li>{items.option}</li>}
+                                    {items.currectOption && <li>{items.currectOption}</li>}
+                                </ul>
+                            </div>
+                        </div>
+                    );
+                })}
             </div>
         </div>
       <div className="iquizCreationPart1">
         {iquizQuestions.map((quiz, index) => (
           <div key={index} className="questions">
             <div onClick={() => setCurrentQuestion(index)} className="question">
-              Question {index + 1}
+              <div className='mini_qNo'>
+                Q{index + 1}.
+                <div className='mini_timer'>{quiz.timer==='' ? 'T' : quiz.timer}</div>
+              </div>
+              <div className='mini_question'>{ quiz.question.trim().length==0 ? <div className='mini_box'></div> : (quiz.question.length > 18 ? quiz.question.slice(0, 18)+'...' : quiz.question) }</div>
+              <div className='mini_options'>
+                <div className='mini_option'>
+                    {quiz.options[0].isCorrect && <div className='mini_correctOption'></div>}
+                </div>
+                <div className='mini_option'>
+                    {quiz.options[1].isCorrect && <div className='mini_correctOption'></div>}
+                </div>
+              </div>
+              <div className='mini_options'>
+                <div className='mini_option'>
+                    {quiz.options[2].isCorrect && <div className='mini_correctOption'></div>}
+                </div>
+                <div className='mini_option'>
+                    {quiz.options[3].isCorrect && <div className='mini_correctOption'></div>}
+                </div>
+              </div>
             </div>
           </div>
         ))}
