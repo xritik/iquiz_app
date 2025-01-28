@@ -91,10 +91,10 @@ const QuizCreation = ({ navigate }) => {
 
     if (filteredErrors.length === 0) {
         setCrossClicked(false);
-        const quizData = { title: iquizTitle, questions: iquizQuestions };
+        const quizData = { user: loggedinUser, title: iquizTitle, questions: iquizQuestions };
 
         try{
-            const response = await fetch('http://localhost:5000/add_iquiz', {
+            const response = await fetch('http://localhost:5000/iquiz', {
                 method: 'POST',
                 headers:{
                 'Content-Type': 'application/json'

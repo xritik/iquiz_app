@@ -12,14 +12,15 @@ body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
     'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
     sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
 }
 
 .homeSection{
-  height: 100vh;
+  height: auto;
   /* background: #1f242d; */
   background: #081b29;
+  overflow-x: hidden;
 }
 nav{
   height: 65px;
@@ -249,11 +250,89 @@ input[type="number"]::-webkit-outer-spin-button {
   }
 }
 
+.iquizStoreSection{
+  width: 100%;
+  height: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 25px;
+  margin-top: 20px;
+  h1{
+    color: #fff;
+    padding-bottom: 20px;
+  }
+}
+.iquizDiv{
+  width: 90%;
+  padding: 20px 10px 20px 30px;
+  margin-top: 3px;
+  display: flex;
+  border: 1px solid #fff;
+  border-radius: 7px;
+}
+.iquizPart1{
+  width: 70%;
+}
+.titleDiv{
+  color: #fff;
+  font-size: 25px;
+  font-weight: bold;
+}
+.questionsDiv{
+  color: #ccc;
+  font-size: 20px;
+  padding-top: 10px;
+}
+.iquizPart2{
+  width: 30%;
+  display: flex;
+  justify-content: space-evenly;
+  align-items: center;
+}
+.hostButton{
+  background: #0ef;
+  padding: 7px 15px;
+  border: none;
+  outline: none;
+  border-radius: 19px;
+  font-size: 20px;
+  cursor: pointer;
+  transition: .4s;
+}
+.hostButton:hover{
+  box-shadow: 0 0 10px 1px #0ef;
+}
+.hostButton:active{
+  box-shadow: none;
+  scale: .8;
+}
+.editDeleteIcons{
+  width: 40%;
+  display: flex;
+  align-items: center;
+  justify-content: space-evenly;
+  font-size: 30px;
+}
+.editDeleteIcons i{
+  cursor: pointer;
+  border: 2px solid transparent;
+  padding: 2px;
+  transition: .3s;
+}
+.editDeleteIcons i:hover{
+  border: 2px solid #0ef;
+}
+.editDeleteIcons i:active{
+  scale: .8;
+}
+
 hr{
   margin-top: 70px;
 }
 footer{
-  padding-top: 20px;
+  padding: 20px;
   display: flex;
   width: 100vw;
   color: #fff;

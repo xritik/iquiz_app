@@ -22,7 +22,7 @@ const iquizRoute = require('./routes/IQuizRoutes');
 app.use('/signUp', signupRoute);
 app.use('/login', loginRoute);
 app.use('/start-game', gameRoute);
-app.use('/add_iquiz', iquizRoute);
+app.use('/iquiz', iquizRoute);
 
 
 app.listen(PORT, () => console.log('Server is running at port ', PORT));

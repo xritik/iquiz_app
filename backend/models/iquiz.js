@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 
 const iquizSchema = new mongoose.Schema({
+    user: { type: String, required: true },
     title: { type: String, required: true },
     questions: [
       {

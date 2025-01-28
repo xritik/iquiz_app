@@ -1,9 +1,11 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 
 const Home = ({navigate, setShowSignUp}) => {
 
   const loggedinUser = localStorage.getItem('IQuiz_loginName')
   const [isProfileCard, setIsProfileCard] = useState(false);
+  const [iquizzes, setIquizzes] = useState();
+  console.log(iquizzes)
 
   const handleJoinGame = async() => {
     window.open('http://localhost:3001/');
@@ -36,6 +38,30 @@ const Home = ({navigate, setShowSignUp}) => {
     localStorage.removeItem('IQuiz_loginName');
     window.location.reload();
   }
+
+  const fetchIQuizzes = async () => {
+    try {
+      const response = await fetch(`http://localhost:5000/iquiz/${loggedinUser}`);
+      const data = await response.json();
+      if(response.ok){
+        console.log(data[0].questions[0]);
+        setIquizzes(data);
+      }else if(response.status === 404){
+        alert(data.message);
+      }else if(response.status === 500){
+        alert(data.message);
+      }else{
+        alert('Something went wrong, Please try again!!');
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      alert('Something went wrong, Please try again!');
+    }
+  };
+
+  useEffect(() => {
+    fetchIQuizzes();
+  }, [ navigate ] );
 
   return (
     <div className='homeSection'>
@@ -89,7 +115,51 @@ const Home = ({navigate, setShowSignUp}) => {
       </div>
 
       <div className='createIQuizButtons'>
-        <button className='btn' onClick={() => {navigate(`${loggedinUser ? '/adding_iquiz' : '/login_signUp'}`)}}>Create a IQuiz</button>
+        <button className='btn' onClick={() => {navigate(`${loggedinUser ? '/adding_iquiz' : '/login_signUp'}`)}}>Create a new IQuiz</button>
+      </div>
+
+      <div className='iquizStoreSection'>
+        <h1>Your saved IQuizzes</h1>
+        {/* {iquizzes.map((iquiz) => {
+          <div className='iquizDiv' key={iquiz._id}>
+            <div className='iquizPart1'>
+              <div className='titleDiv'>{iquiz.title}</div>
+              <div className='questionsDiv'>2 Questions</div>
+            </div>
+            <div className='iquizPart2'>
+              <button className='hostButton'>Host Live</button>
+              <div className='editDeleteIcons'>
+                <i class='bx bxs-pencil' style={{color:'green'}}></i>
+                <i class='bx bxs-trash' style={{color:'red'}}></i>
+              </div>
+            </div>
+          </div>
+        })} */}
+
+        {iquizzes ? (
+          Array.isArray(iquizzes) ? (
+            iquizzes.map((iquiz) => (
+              <div className='iquizDiv' key={iquiz._id}>
+                <div className='iquizPart1'>
+                  <div className='titleDiv'>{iquiz.title}</div>
+                  <div className='questionsDiv'>{iquiz.questions.length} Question{iquiz.questions.length>1 ? 's' : ''}</div>
+                </div>
+                <div className='iquizPart2'>
+                  <button className='hostButton'>Host Live</button>
+                  <div className='editDeleteIcons'>
+                    <i class='bx bxs-pencil' style={{color:'green'}}></i>
+                    <i class='bx bxs-trash' style={{color:'red'}}></i>
+                  </div>
+                </div>
+              </div>
+            ))
+          ) : (
+            <p>No quizzes available</p>
+          )
+        ) : (
+          <p>Loading quizzes...</p>
+        )}
+
       </div>
 
       <hr/>
