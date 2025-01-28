@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import '../css/iquiz_creation_page.css'
 
 const QuizCreation = ({ navigate }) => {
@@ -18,6 +18,14 @@ const QuizCreation = ({ navigate }) => {
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [errorsState, setErrorsState] = useState([]);
   const [crossClicked, setCrossClicked] = useState(false);
+  const loggedinUser = localStorage.getItem('IQuiz_loginName');
+    
+    useEffect(() => {
+        if( !loggedinUser ){
+        alert('Please login to get this page!')
+        navigate('/login_signUp');
+        }
+    });
   
   
 //   console.log(iquizQuestions);

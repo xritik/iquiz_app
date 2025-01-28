@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom';
 import '../css/login_signup.css';
 
@@ -6,7 +6,14 @@ const Login_Signup = ({navigate, showSignUp, setShowSignUp}) => {
 
   const [name, setName] = useState('');
   const [password, setPassword] = useState('');
-
+  const loggedinUser = localStorage.getItem('IQuiz_loginName');
+  
+  useEffect(() => {
+    if(loggedinUser && loggedinUser.trim().length > 0){
+      alert('You are already logged-in!')
+      navigate('/home');
+    }
+  });
   const handleSignup = async () => {
 
     try {
