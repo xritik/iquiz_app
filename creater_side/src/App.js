@@ -3,6 +3,7 @@ import  Home  from './components/Home.js';
 import Login_Signup  from './components/Login_Signup.js';
 import { useState } from "react";
 import IQuizCreationPage from "./components/IQuizCreationPage.js";
+import IQuizEditionPage from "./components/IQuizEditionPage.js";
 
 function App() {
   const navigate = useNavigate();
@@ -15,6 +16,7 @@ function App() {
         <Route path={'/home'} element={<Home navigate={navigate} setShowSignUp={setShowSignUp} />} />
         <Route path={'/login_signUp'} element={<Login_Signup navigate={navigate} showSignUp={showSignUp} setShowSignUp={setShowSignUp} />} />
         <Route path={'/adding_iquiz'} element={<IQuizCreationPage navigate={navigate} />} />
+        <Route path={'/editing_iquiz'} element={<IQuizEditionPage navigate={navigate} />} />
       </Routes>
     </div>
   );

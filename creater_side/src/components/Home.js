@@ -65,6 +65,11 @@ const Home = ({navigate, setShowSignUp}) => {
     }
   }, [ navigate ] );
 
+  const handleEdit = (iquiz) => {
+    localStorage.setItem('editingIQuiz', JSON.stringify(iquiz));
+    navigate('/editing_iquiz')
+  };
+
   return (
     <div className='homeSection'>
       {loggedinUser && <>
@@ -135,8 +140,8 @@ const Home = ({navigate, setShowSignUp}) => {
                   <div className='iquizPart2'>
                     <button className='hostButton'>Host Live</button>
                     <div className='editDeleteIcons'>
-                      <i class='bx bxs-pencil' style={{color:'green'}}></i>
-                      <i class='bx bxs-trash' style={{color:'red'}}></i>
+                      <i className='bx bxs-pencil' onClick={() => handleEdit(iquiz)} style={{color:'green'}}></i>
+                      <i className='bx bxs-trash' style={{color:'red'}}></i>
                     </div>
                   </div>
                 </div>
