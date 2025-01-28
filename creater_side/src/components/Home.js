@@ -60,7 +60,9 @@ const Home = ({navigate, setShowSignUp}) => {
   };
 
   useEffect(() => {
-    fetchIQuizzes();
+    if(loggedinUser){
+      fetchIQuizzes();
+    }
   }, [ navigate ] );
 
   return (
@@ -118,49 +120,36 @@ const Home = ({navigate, setShowSignUp}) => {
         <button className='btn' onClick={() => {navigate(`${loggedinUser ? '/adding_iquiz' : '/login_signUp'}`)}}>Create a new IQuiz</button>
       </div>
 
-      <div className='iquizStoreSection'>
-        <h1>Your saved IQuizzes</h1>
-        {/* {iquizzes.map((iquiz) => {
-          <div className='iquizDiv' key={iquiz._id}>
-            <div className='iquizPart1'>
-              <div className='titleDiv'>{iquiz.title}</div>
-              <div className='questionsDiv'>2 Questions</div>
-            </div>
-            <div className='iquizPart2'>
-              <button className='hostButton'>Host Live</button>
-              <div className='editDeleteIcons'>
-                <i class='bx bxs-pencil' style={{color:'green'}}></i>
-                <i class='bx bxs-trash' style={{color:'red'}}></i>
-              </div>
-            </div>
-          </div>
-        })} */}
+      {loggedinUser && 
+        <div className='iquizStoreSection'>
+          <h1>Your saved IQuizzes</h1>
 
-        {iquizzes ? (
-          Array.isArray(iquizzes) ? (
-            iquizzes.map((iquiz) => (
-              <div className='iquizDiv' key={iquiz._id}>
-                <div className='iquizPart1'>
-                  <div className='titleDiv'>{iquiz.title}</div>
-                  <div className='questionsDiv'>{iquiz.questions.length} Question{iquiz.questions.length>1 ? 's' : ''}</div>
-                </div>
-                <div className='iquizPart2'>
-                  <button className='hostButton'>Host Live</button>
-                  <div className='editDeleteIcons'>
-                    <i class='bx bxs-pencil' style={{color:'green'}}></i>
-                    <i class='bx bxs-trash' style={{color:'red'}}></i>
+          {iquizzes ? (
+            Array.isArray(iquizzes) ? (
+              iquizzes.map((iquiz) => (
+                <div className='iquizDiv' key={iquiz._id}>
+                  <div className='iquizPart1'>
+                    <div className='titleDiv'>{iquiz.title}</div>
+                    <div className='questionsDiv'>{iquiz.questions.length} Question{iquiz.questions.length>1 ? 's' : ''}</div>
+                  </div>
+                  <div className='iquizPart2'>
+                    <button className='hostButton'>Host Live</button>
+                    <div className='editDeleteIcons'>
+                      <i class='bx bxs-pencil' style={{color:'green'}}></i>
+                      <i class='bx bxs-trash' style={{color:'red'}}></i>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))
+              ))
+            ) : (
+              <p>No quizzes available</p>
+            )
           ) : (
-            <p>No quizzes available</p>
-          )
-        ) : (
-          <p>Loading quizzes...</p>
-        )}
+            <p>Loading quizzes...</p>
+          )}
 
-      </div>
+        </div>
+      }
 
       <hr/>
       <footer>

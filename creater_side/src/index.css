@@ -17,6 +17,7 @@ body {
 }
 
 .homeSection{
+  min-height: 100vh;
   height: auto;
   /* background: #1f242d; */
   background: #081b29;
