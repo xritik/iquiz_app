@@ -110,6 +110,7 @@ const IQuizEditionPage = ({ navigate }) => {
                     const data = await response.json();
             if(response.ok){
                 console.log('Quiz Data:', quizData);
+                localStorage.removeItem('editingIQuiz');
                 alert(data.message);
                 navigate('/home');
             }else if(response.status === 404){
@@ -203,7 +204,7 @@ const IQuizEditionPage = ({ navigate }) => {
       </div>
 
       <div className="iquizCreationPart2">
-      <i className='bx bx-arrow-back back_arrow back_arrow1' onClick={() => {navigate('/')}}></i>
+      <i className='bx bx-arrow-back back_arrow back_arrow1' onClick={() => {navigate('/'); localStorage.removeItem('editingIQuiz')}}></i>
         <form
           className="addingIQuizForm"
           onSubmit={(e) => {

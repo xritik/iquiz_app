@@ -29,7 +29,7 @@ router.post('/:id', async (req, res) => {
   try {
     const { quizData } = req.body;
     const { id } = req.params;
-    
+
     const updatedIQuiz = await IQuiz.findByIdAndUpdate(
       id,
       { $set: quizData },
@@ -53,9 +53,11 @@ router.get('/:loggedinUser', async (req, res) => {
 
     try {
         const iquiz = await IQuiz.find({ user: loggedinUser });
-        if( !iquiz ){
-            return res.status(404).json({ message: 'You have no any saved IQuizzes, So create it!' });
+        
+        if (iquiz.length === 0) {
+          return res.status(200).json([]);
         }
+
         res.status(200).json( iquiz );
     } catch (error) {
         res.status(500).json({ message: 'Error fetching your saved IQuizzes!' });
