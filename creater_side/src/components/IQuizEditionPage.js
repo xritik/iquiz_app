@@ -21,123 +21,136 @@ const IQuizEditionPage = ({ navigate }) => {
             ]
     );
       
-      const [currentQuestion, setCurrentQuestion] = useState(0);
-      const [errorsState, setErrorsState] = useState([]);
-      const [crossClicked, setCrossClicked] = useState(false);
-        
-        useEffect(() => {
-            if( !loggedinUser ){
-            alert('Please login to get this page!')
-            navigate('/login_signUp');
-            }else{
-                console.log(storedIQuiz);
-            }
-        });
-      
-      
+    const [currentQuestion, setCurrentQuestion] = useState(0);
+    const [errorsState, setErrorsState] = useState([]);
+    const [crossClicked, setCrossClicked] = useState(false);
     
-      const handleQuestionChange = (index, value) => {
-        const updatedQuestions = [...iquizQuestions];
-        updatedQuestions[index].question = value;
-        setIquizQuestions(updatedQuestions);
-      };
-    
-      const handleTimerChange = (index, value) => {
-        const updatedQuestions = [...iquizQuestions];
-        updatedQuestions[index].timer = value;
-        setIquizQuestions(updatedQuestions);
-      };
-    
-      const handleOptionChange = (index, Index, value) => {
-        const updatedQuestions = [...iquizQuestions];
-        updatedQuestions[Index].options[index].text = value;
-        setIquizQuestions(updatedQuestions);
-      };
-    
-      const handleSetCorrectOption = (index, Index) => {
-        const updatedQuestions = [...iquizQuestions];
-        updatedQuestions[Index].options[index].isCorrect = !(updatedQuestions[Index].options[index].isCorrect)
-        setIquizQuestions(updatedQuestions);
-      };
-    
-      const addEmptyQuestion = () => {
-        const newQuestion = {
-          question: '',
-          timer: '',
-          options: [
-            { text: '', isCorrect: false },
-            { text: '', isCorrect: false },
-            { text: '', isCorrect: false },
-            { text: '', isCorrect: false },
-          ],
-        };
-        setIquizQuestions([...iquizQuestions, newQuestion]);
-        setCurrentQuestion(iquizQuestions.length);
-      };
-    
-      const handleEdit = async () => {
-        const validationErrors = iquizQuestions.map((q, questionIndex) => {
-          const questionErrors = {
-            question: q.question.trim() === '' ? 'Question text is empty' : null,
-            timer: q.timer.trim() === '' ? 'Timer is empty' : null,
-            option: q.options.some((option) => option.text.trim() === '' ) ? 'Option is empty' : null,
-            currectOption: !q.options.some((option) => option.isCorrect) ? 'No correct option selected!' : null,
-          };
-          return questionErrors;
-        });
-    
-        const filteredErrors = validationErrors.filter(
-          (error) => error.question || error.timer || error.option  || error.currectOption
-        );
-        // setErrorsState(filteredErrors);
-        // console.log(filteredErrors);
-    
-        setErrorsState(validationErrors);
-        console.log(validationErrors);
-    
-        if (filteredErrors.length === 0) {
-            setCrossClicked(false);
-            const quizData = { user: loggedinUser, title: iquizTitle, questions: iquizQuestions };
-    
-            try{
-                const response = await fetch(`http://localhost:5000/iquiz/${storedIQuiz._id}`, {
-                    method: 'POST',
-                    headers:{
-                    'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ quizData })
-                });
-                    const data = await response.json();
-            if(response.ok){
-                console.log('Quiz Data:', quizData);
-                localStorage.removeItem('editingIQuiz');
-                alert(data.message);
-                navigate('/home');
-            }else if(response.status === 404){
-                alert(data.message);
-            }else if(response.status === 500){
-                alert(data.message);
-            } else{
-                alert('Something went wrong, Please try again!!');
-            }
-            } catch (error) {
-                console.error(error);
-                alert('Something went wrong, Please try again!!');
-            }
-                // console.log('Quiz Data:', quizData);
-                // alert('Quiz saved successfully!');
+    useEffect(() => {
+        if( !loggedinUser ){
+        alert('Please login to get this page!')
+        navigate('/login_signUp');
         }else{
-            setCrossClicked(true);
+            console.log(storedIQuiz);
         }
-      };
+    });
     
-    //   useEffect(() => {
-        console.log(iquizQuestions);
-    //   }, [ errorsState ]);
     
-      const handleClick = () => {
+
+    const handleQuestionChange = (index, value) => {
+    const updatedQuestions = [...iquizQuestions];
+    updatedQuestions[index].question = value;
+    setIquizQuestions(updatedQuestions);
+    };
+
+    const handleTimerChange = (index, value) => {
+    const updatedQuestions = [...iquizQuestions];
+    updatedQuestions[index].timer = value;
+    setIquizQuestions(updatedQuestions);
+    };
+
+    const handleOptionChange = (index, Index, value) => {
+    const updatedQuestions = [...iquizQuestions];
+    updatedQuestions[Index].options[index].text = value;
+    setIquizQuestions(updatedQuestions);
+    };
+
+    const handleSetCorrectOption = (index, Index) => {
+    const updatedQuestions = [...iquizQuestions];
+    updatedQuestions[Index].options[index].isCorrect = !(updatedQuestions[Index].options[index].isCorrect)
+    setIquizQuestions(updatedQuestions);
+    };
+
+    const addEmptyQuestion = () => {
+    const newQuestion = {
+        question: '',
+        timer: '',
+        options: [
+        { text: '', isCorrect: false },
+        { text: '', isCorrect: false },
+        { text: '', isCorrect: false },
+        { text: '', isCorrect: false },
+        ],
+    };
+    setIquizQuestions([...iquizQuestions, newQuestion]);
+    setCurrentQuestion(iquizQuestions.length);
+    };
+
+    const handleEdit = async () => {
+    const validationErrors = iquizQuestions.map((q, questionIndex) => {
+        const questionErrors = {
+        question: q.question.trim() === '' ? 'Question text is empty' : null,
+        timer: q.timer.trim() === '' ? 'Timer is empty' : null,
+        option: q.options.some((option) => option.text.trim() === '' ) ? 'Option is empty' : null,
+        currectOption: !q.options.some((option) => option.isCorrect) ? 'No correct option selected!' : null,
+        };
+        return questionErrors;
+    });
+
+    const filteredErrors = validationErrors.filter(
+        (error) => error.question || error.timer || error.option  || error.currectOption
+    );
+    // setErrorsState(filteredErrors);
+    // console.log(filteredErrors);
+
+    setErrorsState(validationErrors);
+    console.log(validationErrors);
+
+    if (filteredErrors.length === 0) {
         setCrossClicked(false);
+        const quizData = { user: loggedinUser, title: iquizTitle, questions: iquizQuestions };
+
+        try{
+            const response = await fetch(`http://localhost:5000/iquiz/${storedIQuiz._id}`, {
+                method: 'POST',
+                headers:{
+                'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ quizData })
+            });
+                const data = await response.json();
+        if(response.ok){
+            console.log('Quiz Data:', quizData);
+            localStorage.removeItem('editingIQuiz');
+            alert(data.message);
+            navigate('/home');
+        }else if(response.status === 404){
+            alert(data.message);
+        }else if(response.status === 500){
+            alert(data.message);
+        } else{
+            alert('Something went wrong, Please try again!!');
+        }
+        } catch (error) {
+            console.error(error);
+            alert('Something went wrong, Please try again!!');
+        }
+            // console.log('Quiz Data:', quizData);
+            // alert('Quiz saved successfully!');
+    }else{
+        setCrossClicked(true);
     }
+    };
+    
+    const handleDelete = (index) => {
+    if(iquizQuestions.length > 1){
+        const confirmation = window.confirm('Are you sure to delete this question?');
+        if(confirmation){
+            // const newArray = iquizQuestions.;
+            setIquizQuestions(prevQuestions => prevQuestions.filter((_, i) => i !== index));
+            // console.log(iquizQuestions);
+            setCurrentQuestion( (currentQuestion > (iquizQuestions.length-2)) ? iquizQuestions.length-2 : currentQuestion )
+        }
+    }else{
+        alert("You can't delete the last one question.")
+    }
+    };
+    
+    const handleClick = () => {
+        setCrossClicked(false);
+    };
+
+
+    
   return (
     <div className="iquizCreationSection">
         <div className='popupSection' style={{display: `${ crossClicked ? 'flex' : 'none'}`}}>
@@ -173,7 +186,10 @@ const IQuizEditionPage = ({ navigate }) => {
       <div className="iquizCreationPart1">
         {iquizQuestions.map((quiz, index) => (
           <div key={index} className="questions">
-            <div onClick={() => setCurrentQuestion(index)} className="question">
+            <div className='delIcon'>
+                <i className='bx bxs-trash' onClick={() => handleDelete(index)} style={{color:`${currentQuestion===index ? 'red' : 'transparent'}`}}></i>
+            </div>
+            <div onClick={() => setCurrentQuestion(index)} className="question" style={{borderColor:`${currentQuestion===index ? '#0ef' : '#ccc'}`, color:`${currentQuestion===index ? '#0ef' : '#ccc'}`}}>
               <div className='mini_qNo'>
                 Q{index + 1}.
                 <div className='mini_timer'>{quiz.timer==='' ? 'T' : quiz.timer}</div>

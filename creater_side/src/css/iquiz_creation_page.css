@@ -22,13 +22,12 @@
 }
 .questions{
     display: flex;
-    flex-direction: column;
-    gap: 15px;
+    /* gap: 15px; */
 }
 .question{
     min-height: 90px;
     width: 150px;
-    border: 1px solid #ccc;
+    border: 2px solid #ccc;
     border-radius: 7px;
     /* display: flex;
     justify-content: center;
@@ -38,6 +37,27 @@
     font-weight: bold;
     font-size: 18px;
     transition: .5s;
+}
+.questions:hover > .question{
+    border-color: #0ef !important;
+    color: #0ef !important;
+}
+.delIcon{
+    display: flex;
+    align-items: center;
+    padding-right: 3px;
+}
+.delIcon i{
+    color: transparent;
+    font-size: 17px;
+    cursor: pointer;
+    transition: .4s;
+}
+.questions:hover > .delIcon i{
+    color: red !important;
+}
+.delIcon i:active{
+    scale: .8;
 }
 .mini_qNo{
     padding: 5px 7px 0px 7px;

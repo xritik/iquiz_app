@@ -117,16 +117,24 @@ const QuizCreation = ({ navigate }) => {
             console.error(error);
             alert('Something went wrong, Please try again!!');
         }
-            // console.log('Quiz Data:', quizData);
-            // alert('Quiz saved successfully!');
     }else{
         setCrossClicked(true);
     }
   };
 
-//   useEffect(() => {
-    console.log(iquizQuestions);
-//   }, [ errorsState ]);
+  const handleDelete = (index) => {
+    if(iquizQuestions.length > 1){
+        const confirmation = window.confirm('Are you sure to delete this question?');
+        if(confirmation){
+            // const newArray = iquizQuestions.;
+            setIquizQuestions(prevQuestions => prevQuestions.filter((_, i) => i !== index));
+            // console.log(iquizQuestions);
+            setCurrentQuestion( (currentQuestion > (iquizQuestions.length-2)) ? iquizQuestions.length-2 : currentQuestion )
+        }
+    }else{
+        alert("You can't delete the last one question.")
+    }
+  };
 
   const handleClick = () => {
     setCrossClicked(false);
@@ -168,7 +176,10 @@ const QuizCreation = ({ navigate }) => {
       <div className="iquizCreationPart1">
         {iquizQuestions.map((quiz, index) => (
           <div key={index} className="questions">
-            <div onClick={() => setCurrentQuestion(index)} className="question">
+            <div className='delIcon'>
+                <i className='bx bxs-trash' onClick={() => handleDelete(index)} style={{color:`${currentQuestion===index ? 'red' : 'transparent'}`}}></i>
+            </div>
+            <div onClick={() => setCurrentQuestion(index)} className="question" style={{borderColor:`${currentQuestion===index ? '#0ef' : '#ccc'}`, color:`${currentQuestion===index ? '#0ef' : '#ccc'}`}}>
               <div className='mini_qNo'>
                 Q{index + 1}.
                 <div className='mini_timer'>{quiz.timer==='' ? 'T' : quiz.timer}</div>
