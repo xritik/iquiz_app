@@ -68,6 +68,32 @@ const Home = ({navigate, setShowSignUp}) => {
     navigate('/editing_iquiz')
   };
 
+  const handleDelete = async (id) => {
+    const confirmation = window.confirm('Are you sure to Delete this IQuiz?');
+
+    if(confirmation){
+      try {
+        const response = await fetch(`http://localhost:5000/iquiz/${id}`,{
+          method: 'DELETE'
+        });
+        const data = await response.json();
+        if(response.ok){
+          fetchIQuizzes();
+          alert(data.message);
+        }else if(response.status === 404){
+          alert(data.message);
+        }else if(response.status === 500){
+          alert(data.message);
+        } else{
+          alert('Failed to delete IQuiz!');
+        }
+      } catch (error) {
+        console.error('Error deleting quiz:', error);
+        alert('Something went wrong, Please try again!!'); 
+      }
+    }
+  };
+
   return (
     <div className='homeSection'>
       {loggedinUser && <>
@@ -138,7 +164,7 @@ const Home = ({navigate, setShowSignUp}) => {
                   <button className='hostButton'>Host Live</button>
                   <div className='editDeleteIcons'>
                     <i className='bx bxs-pencil' onClick={() => handleEdit(iquiz)} style={{color:'green'}}></i>
-                    <i className='bx bxs-trash' style={{color:'red'}}></i>
+                    <i className='bx bxs-trash' onClick={() => handleDelete(iquiz._id)} style={{color:'red'}}></i>
                   </div>
                 </div>
               </div>

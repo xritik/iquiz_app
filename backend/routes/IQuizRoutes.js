@@ -2,6 +2,23 @@ const express = require('express');
 const router = express.Router();
 const IQuiz = require('../models/iquiz');
 
+
+router.get('/:loggedinUser', async (req, res) => {
+    const { loggedinUser } = req.params;
+
+    try {
+        const iquiz = await IQuiz.find({ user: loggedinUser });
+        
+        if (iquiz.length === 0) {
+          return res.status(200).json([]);
+        }
+
+        res.status(200).json( iquiz );
+    } catch (error) {
+        res.status(500).json({ message: 'Error fetching your saved IQuizzes!' });
+    }
+});
+
 router.post('/', async (req, res) => {
     try {
       const { quizData } = req.body;
@@ -48,20 +65,20 @@ router.post('/:id', async (req, res) => {
   }
 });
 
-router.get('/:loggedinUser', async (req, res) => {
-    const { loggedinUser } = req.params;
+router.delete('/:id', async (req, res) => {
+  const { id } = req.params;
 
-    try {
-        const iquiz = await IQuiz.find({ user: loggedinUser });
-        
-        if (iquiz.length === 0) {
-          return res.status(200).json([]);
-        }
-
-        res.status(200).json( iquiz );
-    } catch (error) {
-        res.status(500).json({ message: 'Error fetching your saved IQuizzes!' });
+  try {
+    const deletedIQuiz = await IQuiz.findByIdAndDelete( id );
+    if(!deletedIQuiz){
+      return res.status(404).json({ message: 'IQuiz not found to delete!' });
     }
+
+    res.status(200).json({ message: 'IQuiz deleted Successfully!' })
+  } catch (error) {
+    res.status(500).json({ message: 'Internal server error!' })
+  }
 });
+
 
 module.exports = router;
