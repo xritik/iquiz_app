@@ -5,7 +5,7 @@ const Home = ({navigate, setShowSignUp}) => {
   const loggedinUser = localStorage.getItem('IQuiz_loginName')
   const [isProfileCard, setIsProfileCard] = useState(false);
   const [iquizzes, setIquizzes] = useState([]);
-  console.log(iquizzes)
+  // console.log(iquizzes)
 
   const handleJoinGame = async() => {
     window.open('http://localhost:3001/');
@@ -94,6 +94,15 @@ const Home = ({navigate, setShowSignUp}) => {
     }
   };
 
+  const handleHost = (id) => {
+    let pin = '';
+    for(let i=0; i<4; i++){
+      pin += Math.floor(Math.random(4)*10);
+    };
+    console.log(pin);
+    console.log(id);
+  };
+
   return (
     <div className='homeSection'>
       {loggedinUser && <>
@@ -161,7 +170,7 @@ const Home = ({navigate, setShowSignUp}) => {
                   <div className='questionsDiv'>{iquiz.questions.length} Question{iquiz.questions.length>1 ? 's' : ''}</div>
                 </div>
                 <div className='iquizPart2'>
-                  <button className='hostButton'>Host Live</button>
+                  <button className='hostButton' onClick={() => handleHost(iquiz._id)}>Host Live</button>
                   <div className='editDeleteIcons'>
                     <i className='bx bxs-pencil' onClick={() => handleEdit(iquiz)} style={{color:'green'}}></i>
                     <i className='bx bxs-trash' onClick={() => handleDelete(iquiz._id)} style={{color:'red'}}></i>
