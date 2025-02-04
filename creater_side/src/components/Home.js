@@ -5,27 +5,33 @@ const Home = ({navigate, setShowSignUp}) => {
   const loggedinUser = localStorage.getItem('IQuiz_loginName')
   const [isProfileCard, setIsProfileCard] = useState(false);
   const [iquizzes, setIquizzes] = useState([]);
+  const [crossClicked, setCrossClicked] = useState(false);
+  const [iquizPin, setIQuizPin] = useState(localStorage.getItem('gamePin') || '');
+  const [playerPin, setPlayerPin] = useState('');
+  const [playerName, setPlayerName] = useState('');
+  const [players, setPlayers] = useState([]);
+  const storedPin = localStorage.getItem('gamePin');
   // console.log(iquizzes)
 
-  const handleJoinGame = async() => {
-    window.open('http://localhost:3001/');
-    // try {
-    //   const response = await fetch('http://localhost:5000/start-game', {
-    //     method: 'POST',
-    //   });
+  // const handleJoinGame = async() => {
+  //   window.open('http://localhost:3001/');
+  //   try {
+  //     const response = await fetch('http://localhost:5000/start-game', {
+  //       method: 'POST',
+  //     });
 
-    //   if (response.ok) {
-    //     const result = await response.json();
-    //     alert(result.message);
-    //     navigate('http://localhost:3001/');
-    //   } else {
-    //     alert('Failed to start IQuiz!');
-    //   }
-    // } catch (error) {
-    //   console.error('Error:', error);
-    //   alert('Error starting IQuiz!');
-    // }
-  }
+  //     if (response.ok) {
+  //       const result = await response.json();
+  //       alert(result.message);
+  //       navigate('http://localhost:3001/');
+  //     } else {
+  //       alert('Failed to start IQuiz!');
+  //     }
+  //   } catch (error) {
+  //     console.error('Error:', error);
+  //     alert('Error starting IQuiz!');
+  //   }
+  // }
 
   const showProfileCard = () => {
     setIsProfileCard(true);
@@ -94,13 +100,122 @@ const Home = ({navigate, setShowSignUp}) => {
     }
   };
 
-  const handleHost = (id) => {
-    let pin = '';
-    for(let i=0; i<4; i++){
-      pin += Math.floor(Math.random(4)*10);
+  const handleCross = async (pin) => {
+    const confirmation = window.confirm('Are you sure to stop hosting of this IQuiz?');
+    if(confirmation){
+      try {
+        const response = await fetch(`http://localhost:5000/runningIQuiz/delete/${pin}`,{
+          method: 'DELETE'
+        });
+        const data = await response.json();
+        if(response.ok){
+          setCrossClicked(false);
+          localStorage.removeItem('gamePin');
+          alert(data.message);
+        }else if(response.status===404){
+          alert(data.message);
+        }else if(response.status===500){
+          alert(data.message);
+        }else{
+          alert('Something went wrong, Please try again!!');
+        }
+      } catch (error) {
+        console.error(error);
+        alert('Something went wrong, Please try again!');
+      }
     };
-    console.log(pin);
-    console.log(id);
+  };
+
+  const getPlayers = async () => {
+    try {
+      const response = await fetch(`http://localhost:5000/runningIQuiz/players/${storedPin}`);
+      const data = await response.json();
+      // console.log(data)
+      if(response.ok){
+        setPlayers(data);
+      }
+    } catch (error) {
+      // console.error(error);
+    }
+  }
+
+  useEffect(() => {
+    if (!storedPin) return;
+  
+    const intervalId = setInterval(() => {
+      getPlayers();
+    }, 500);
+  
+    return () => clearInterval(intervalId);
+  }, [storedPin]);
+
+  const handleHost = async (id) => {
+    if(storedPin){
+      alert('You already hosted an IQuiz!');
+    }else{
+      const confirmation = window.confirm('Are you sure to host this IQuiz?');
+      if(confirmation){
+        let pin = '';
+        for(let i=0; i<6; i++){
+          pin += Math.floor(Math.random(6)*10);
+        };
+        setIQuizPin(pin);
+        localStorage.setItem('gamePin', pin);
+
+        try {
+          const response = await fetch(`http://localhost:5000/runningIQuiz/host`,{
+            method: 'POST',
+            headers:{
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ loggedinUser, id, pin })
+          });
+          const data = await response.json();
+          if(response.ok){
+            setCrossClicked(true)
+            // getPlayers(pin);
+          }else if(response.status===409){
+            alert(data.message);
+          }else if(response.status===500){
+            alert(data.message);
+          }else{
+            alert('Something went wrong, Please try again!!');
+          }
+        } catch (error) {
+          console.error(error);
+          alert('Something went wrong, Please try again!!');
+        }
+        console.log(pin);
+        console.log(id);
+      };
+    }
+  };
+
+  const handleJoin = async () => {
+    try {
+      const response = await fetch('http://localhost:5000/runningIQuiz/join',{
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ playerName, playerPin })
+      });
+      const data = await response.json();
+      if(response.ok){
+        alert(data.message);
+      }else if(response.status===404){
+        alert(data.message);
+      }else if(response.status===409){
+        alert(data.message);
+      }else if(response.status===500){
+        alert(data.message);
+      }else{
+        alert('Something went wrong, Please try again!');
+      }
+    } catch (error) {
+      console.error(error);
+      alert('Something went wrong, Please try again!');
+    }
   };
 
   return (
@@ -115,6 +230,34 @@ const Home = ({navigate, setShowSignUp}) => {
           <button className='profileBtn' onClick={handleLogout}>Logout</button>
         </div>
       </>}
+
+      <div className='popupSection' style={{display: `${ storedPin ? 'flex' : 'none'}`}}>
+        <div className='popupCard'>
+          <i className='bx bx-x cross cross1' onClick={() => handleCross(iquizPin)}></i>
+          <h1 style={{textAlign:'center'}}>Waiting for players...</h1>
+          <p style={{fontSize:'30px', color:'gray'}}>Your game pin is:- <strong style={{color:'green'}}>{iquizPin}</strong></p>
+
+          <div className="joinedPlayerSection">
+            {players.map((player) => (
+              <div className="joinedPlayer" key={player._id}>
+                <i className="bx bxs-user"></i>
+                <p>{player.name.length > 8 ? player.name.slice(0,7)+'...' : player.name}</p>
+              </div>
+            ))}
+          </div>
+
+          <div className='startStopButtons'>
+            <button style={{background:'green'}}>Start</button>
+            <button style={{background:'red'}} onClick={() => handleCross(iquizPin)}>Stop</button>
+            <span className='allPlayers'>
+              <i className="bx bxs-user"></i>
+              <p>{players.length}</p>
+            </span>
+          </div>
+
+        </div>
+      </div>
+
       <nav>
         <div className='navbar'>
           <div className='nav1'><span className='bName1'>IQ</span><span className='bName2'>uiz</span></div>
@@ -136,16 +279,20 @@ const Home = ({navigate, setShowSignUp}) => {
         </div>
       </nav>
       <div className='homePage'>
-        <form className='homePageForm' onSubmit={(e) => { e.preventDefault(); handleJoinGame()}}>
+        <form className='homePageForm' onSubmit={(e) => { e.preventDefault(); handleJoin()}}>
           <p></p>
           <input
             type='text'
+            value={playerName}
+            onChange={(e) => setPlayerName(e.target.value)}
             required
             autoFocus
             placeholder='Enter a nick name'
           />
           <input
             type='number'
+            value={playerPin}
+            onChange={(e) => setPlayerPin(e.target.value)}
             required
             placeholder='Enter your game pin'
           />

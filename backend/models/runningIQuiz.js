@@ -6,7 +6,7 @@ const runningIQuizSchema = new mongoose.Schema({
         required: true,
     },
     pin: {
-        type: Number,
+        type: String,
         required: true,
     },
     iquizId: {
@@ -15,7 +15,7 @@ const runningIQuizSchema = new mongoose.Schema({
     },
     players: [
         {
-            name: { type: String, required: true },
+            name: { type: String },
             answers: { type: [Boolean], default: [] },
         }
     ],

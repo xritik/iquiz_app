@@ -144,34 +144,34 @@ const QuizCreation = ({ navigate }) => {
   return (
     <div className="iquizCreationSection">
         <div className='popupSection' style={{display: `${ crossClicked ? 'flex' : 'none'}`}}>
-            <div className='popupCard'>
-                <i className='bx bx-x cross cross1' onClick={handleClick}></i>
-                <h1>This IQuiz can't be saved!</h1>
-                <p>All questions need to be completed before you can start saving.</p>
-                {errorsState.map((items, i) =>{
-                    if (
-                        items.question === null &&
-                        items.timer === null &&
-                        items.option === null &&
-                        items.currectOption === null
-                    ) {
-                        return null;
-                    }
-                    return(
-                        <div className="emptySection" key={i}>
-                            <div className="emptyQue_no">Q{i + 1}.</div>
-                            <div className="emptyQuestions">
-                                <ul>
-                                    {items.question && <li>{items.question}</li>}
-                                    {items.timer && <li>{items.timer}</li>}
-                                    {items.option && <li>{items.option}</li>}
-                                    {items.currectOption && <li>{items.currectOption}</li>}
-                                </ul>
-                            </div>
-                        </div>
-                    );
-                })}
-            </div>
+          <div className='popupCard'>
+            <i className='bx bx-x cross cross1' onClick={handleClick}></i>
+            <h1>This IQuiz can't be saved!</h1>
+            <p>All questions need to be completed before you can start saving.</p>
+            {errorsState.map((items, i) =>{
+              if(
+                  items.question === null &&
+                  items.timer === null &&
+                  items.option === null &&
+                  items.currectOption === null
+              ){
+                  return null;
+              }
+              return(
+                <div className="emptySection" key={i}>
+                  <div className="emptyQue_no">Q{i + 1}.</div>
+                  <div className="emptyQuestions">
+                    <ul>
+                        {items.question && <li>{items.question}</li>}
+                        {items.timer && <li>{items.timer}</li>}
+                        {items.option && <li>{items.option}</li>}
+                        {items.currectOption && <li>{items.currectOption}</li>}
+                    </ul>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
         </div>
       <div className="iquizCreationPart1">
         {iquizQuestions.map((quiz, index) => (
