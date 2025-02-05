@@ -66,6 +66,9 @@ const Home = ({navigate, setShowSignUp}) => {
   useEffect(() => {
     if(loggedinUser){
       fetchIQuizzes();
+    };
+    if(storedPin){
+      setCrossClicked(true);
     }
   }, [ navigate ] );
 
@@ -111,9 +114,12 @@ const Home = ({navigate, setShowSignUp}) => {
         if(response.ok){
           setCrossClicked(false);
           localStorage.removeItem('gamePin');
+          sessionStorage.removeItem('runningIQuiz');
           alert(data.message);
         }else if(response.status===404){
           alert(data.message);
+          setCrossClicked(false);
+          localStorage.removeItem('gamePin');
         }else if(response.status===500){
           alert(data.message);
         }else{
@@ -132,7 +138,13 @@ const Home = ({navigate, setShowSignUp}) => {
       const data = await response.json();
       // console.log(data)
       if(response.ok){
+        // console.log('first')
         setPlayers(data);
+      }else if(response.status===400){
+        setCrossClicked(false);
+        localStorage.removeItem('gamePin');
+        sessionStorage.removeItem('runningIQuiz');
+        console.log('first')
       }
     } catch (error) {
       // console.error(error);
@@ -144,12 +156,14 @@ const Home = ({navigate, setShowSignUp}) => {
   
     const intervalId = setInterval(() => {
       getPlayers();
+      // console.log('first')
     }, 500);
   
     return () => clearInterval(intervalId);
   }, [storedPin]);
 
-  const handleHost = async (id) => {
+  const handleHost = async (iquiz) => {
+    const id = iquiz._id;
     if(storedPin){
       alert('You already hosted an IQuiz!');
     }else{
@@ -173,6 +187,7 @@ const Home = ({navigate, setShowSignUp}) => {
           const data = await response.json();
           if(response.ok){
             setCrossClicked(true)
+            sessionStorage.setItem('runningIQuiz', JSON.stringify(iquiz));
             // getPlayers(pin);
           }else if(response.status===409){
             alert(data.message);
@@ -202,7 +217,9 @@ const Home = ({navigate, setShowSignUp}) => {
       });
       const data = await response.json();
       if(response.ok){
-        alert(data.message);
+        sessionStorage.setItem('playerName', playerName);
+        sessionStorage.setItem('playerPin', playerPin);
+        navigate('/in-game')
       }else if(response.status===404){
         alert(data.message);
       }else if(response.status===409){
@@ -211,6 +228,31 @@ const Home = ({navigate, setShowSignUp}) => {
         alert(data.message);
       }else{
         alert('Something went wrong, Please try again!');
+      }
+    } catch (error) {
+      console.error(error);
+      alert('Something went wrong, Please try again!');
+    }
+  };
+
+  const handleStart = async () => {
+    try {
+      const response = await fetch('http://localhost:5000/runningIQuiz/status',{
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ pin: storedPin, status: 'Started' })
+      });
+      const data = await response.json();
+      if(response.ok){
+        navigate('/question');
+      }else if(response.status===404){
+        alert(data.message);
+      }else if(response.status===500){
+        alert(data.message);
+      }else{
+        alert('Something went wrong, Please try again1!');
       }
     } catch (error) {
       console.error(error);
@@ -231,7 +273,7 @@ const Home = ({navigate, setShowSignUp}) => {
         </div>
       </>}
 
-      <div className='popupSection' style={{display: `${ storedPin ? 'flex' : 'none'}`}}>
+      <div className='popupSection' style={{display: `${ crossClicked ? 'flex' : 'none'}`}}>
         <div className='popupCard'>
           <i className='bx bx-x cross cross1' onClick={() => handleCross(iquizPin)}></i>
           <h1 style={{textAlign:'center'}}>Waiting for players...</h1>
@@ -247,7 +289,7 @@ const Home = ({navigate, setShowSignUp}) => {
           </div>
 
           <div className='startStopButtons'>
-            <button style={{background:'green'}}>Start</button>
+            <button style={{background:'green', cursor:`${players.length===0? 'not-allowed' : 'pointer'}`}} disabled={players.length === 0} onClick={handleStart} >Start</button>
             <button style={{background:'red'}} onClick={() => handleCross(iquizPin)}>Stop</button>
             <span className='allPlayers'>
               <i className="bx bxs-user"></i>
@@ -317,7 +359,7 @@ const Home = ({navigate, setShowSignUp}) => {
                   <div className='questionsDiv'>{iquiz.questions.length} Question{iquiz.questions.length>1 ? 's' : ''}</div>
                 </div>
                 <div className='iquizPart2'>
-                  <button className='hostButton' onClick={() => handleHost(iquiz._id)}>Host Live</button>
+                  <button className='hostButton' onClick={() => handleHost(iquiz)}>Host Live</button>
                   <div className='editDeleteIcons'>
                     <i className='bx bxs-pencil' onClick={() => handleEdit(iquiz)} style={{color:'green'}}></i>
                     <i className='bx bxs-trash' onClick={() => handleDelete(iquiz._id)} style={{color:'red'}}></i>
