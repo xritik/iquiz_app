@@ -19,17 +19,26 @@ const runningIQuizSchema = new mongoose.Schema({
             answers: { type: [Boolean], default: [] },
         }
     ],
-    shownQuestionId: {
-        type: String
-    },
+    shownQuestion:[
+        {
+          question: { type: String, required: true },
+          timer: { type: String, required: true },
+          options: [
+            {
+              text: { type: String, required: true },
+              isCorrect: { type: Boolean, required: true },
+            },
+          ],
+        },
+    ],
     status: {
         type: String,
-        default: 'Stop',
+        default: 'notStarted',
     },
     createdAt: {
         type: Date,
         default: Date.now,
-        expires: 3600,
+        expires: 7200,
     }
 });
 
