@@ -236,13 +236,14 @@ const Home = ({navigate, setShowSignUp}) => {
   };
 
   const handleStart = async () => {
+    const savedIQuiz = JSON.parse(sessionStorage.getItem('runningIQuiz'));
     try {
       const response = await fetch('http://localhost:5000/runningIQuiz/status',{
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ pin: storedPin, status: 'Started' })
+        body: JSON.stringify({ pin: storedPin, status: 'Started', index: 0, timer: savedIQuiz.questions[0].timer })
       });
       const data = await response.json();
       if(response.ok){

@@ -5,7 +5,9 @@ const ShowToPlayerPage = ({ navigate }) => {
     const storedPin = sessionStorage.getItem('playerPin');
     const storedName = sessionStorage.getItem('playerName');
     const [status, setStatus] = useState('notStarted');
-    const [question, setQuestion] = useState({});
+    const [index, setIndex] = useState()
+    const [timer, setTimer] = useState();
+    const [selectedOption, setSelectedOption] = useState(null);
 
     useEffect(() => {
         if(!storedName && !storedPin){
@@ -27,7 +29,8 @@ const ShowToPlayerPage = ({ navigate }) => {
         const data = await response.json();
         if(response.ok){
             setStatus(data.status);
-            setQuestion(data.question[0]);
+            setTimer(data.timer);
+            setIndex(data.index);
         }else if(response.status===400){
             sessionStorage.removeItem('playerPin');
             sessionStorage.removeItem('playerName');
@@ -46,6 +49,10 @@ const ShowToPlayerPage = ({ navigate }) => {
         return () => clearInterval(intervalId);
     }, [storedPin]);
 
+    const handleSelectOption = (index) => {
+        setSelectedOption(selectedOption===index ? null : index); // Set clicked option as selected
+    };
+
   return (
     <div className='showToPlayerSection'>
       <i className='bx bxs-log-out back_arrow' onClick={handleExit}></i>
@@ -58,16 +65,21 @@ const ShowToPlayerPage = ({ navigate }) => {
                                     <div className='myquestion'>Choose the correct option for 3+4=?</div>
                                 </div> */}
 
-                                {/* <div className='mytimer'>
-                                    <span>20</span>
-                                </div> */}
 
                                 <div className='myoptions'>
+                                <div className='mytimer' style={{paddingLeft:'100px'}}>
+                                    <span>{timer}</span>
+                                </div>
                                     <div className='myoption'>
-                                        <div>Option1</div>
-                                        <div>Option2</div>
-                                        <div>Option1</div>
-                                        <div>Option2</div>
+                                        {["Option1", "Option2", "Option3", "Option4"].map((option, index) => (
+                                            <div 
+                                                key={index} 
+                                                className={selectedOption === index ? 'myoption2Active' : ''} 
+                                                onClick={() => handleSelectOption(index)}
+                                            >
+                                                {option}
+                                            </div>
+                                        ))}
                                     </div>
                                     {/* <div className='myoption'>
                                         <div>This is Option3</div>
