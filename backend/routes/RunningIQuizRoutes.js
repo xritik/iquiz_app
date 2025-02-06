@@ -80,7 +80,7 @@ router.get('/status/:storedPin', async (req, res) => {
     const { storedPin } = req.params;
     const iquiz = await RunningIQuiz.findOne({ pin: storedPin });
     if(iquiz){
-        res.status(200).json({ status:iquiz.status, question:iquiz.shownQuestion });
+        res.status(200).json({ status:iquiz.status, index:iquiz.shownQuestionIndex, timer:iquiz.shownQuestionTimer });
     }else if(!iquiz){
         res.status(400).json('None');
     }else{
@@ -89,12 +89,12 @@ router.get('/status/:storedPin', async (req, res) => {
 });
 
 router.post('/status', async (req, res) => {
-    const { pin, status } = req.body;
+    const { pin, status, index, timer } = req.body;
     
     try {
         const iquiz = await RunningIQuiz.findOneAndUpdate(
             { pin: pin },  // Find the quiz by PIN
-            { $set: { status: status } }, // Update status
+            { $set: { status: status, shownQuestionIndex: index, shownQuestionTimer: timer  } }, // Update status
             { new: true }  // Return the updated document
         );
         if (!iquiz) {
