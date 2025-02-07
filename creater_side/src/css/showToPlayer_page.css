@@ -86,7 +86,16 @@
 }
 .myoption2Active{
     box-shadow: 0 0 11px 2px #0ef;
-    box-shadow: 0 0 11px 2px #0ef;
     background-color: #0ef;
+    color: #081b29 !important;
+}
+.correctOption{
+    box-shadow: 0 0 11px 2px green;
+    background-color: green;
+    color: #081b29 !important;
+}
+.incorrectOption{
+    box-shadow: 0 0 11px 2px red;
+    background-color: red;
     color: #081b29 !important;
 }

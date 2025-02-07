@@ -7,6 +7,7 @@ import IQuizEditionPage from "./components/IQuizEditionPage.js";
 import NotFoundPage from "./components/NotFoundPage.js";
 import ShowToPlayerPage from "./components/ShowToPlayerPage.js";
 import QuestionPage from "./components/QuestionPage.js";
+import LeaderBoard from "./components/LeaderBoard.js";
 
 function App() {
   const navigate = useNavigate();
@@ -22,6 +23,7 @@ function App() {
         <Route path={'/editing_iquiz'} element={<IQuizEditionPage navigate={navigate} />} />
         <Route path={'/in-game'} element={<ShowToPlayerPage navigate={navigate} />} />
         <Route path={'/question'} element={<QuestionPage navigate={navigate} />} />
+        <Route path={'/leaderBoard'} element={<LeaderBoard navigate={navigate} />} />
         <Route path={'*'} element={<NotFoundPage navigate={navigate} />}/>
       </Routes>
     </div>

@@ -5,6 +5,9 @@ const QuestionPage = ({ navigate }) => {
     const [index, setIndex] = useState( sessionStorage.getItem('storedIndex') || 0 );
     const [activeClass, setActiveClass] = useState('');
     const [timer, setTimer] = useState(storedRunningIQuiz.questions[index].timer);
+    const storedPin = localStorage.getItem('gamePin');
+    const savedIQuiz = JSON.parse(sessionStorage.getItem('runningIQuiz'));
+
 
     useEffect(() => {
         const timer = setTimeout(() => {
@@ -14,8 +17,40 @@ const QuestionPage = ({ navigate }) => {
         return () => clearTimeout(timer);
     }, [ navigate ]);
 
+    const changeStatus = async () => {
+        try {
+          const response = await fetch('http://localhost:5000/runningIQuiz/statusAnswering',{
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ pin: storedPin, status: 'Answering' })
+          });
+          const data = await response.json();
+          if(response.ok){
+            navigate('/leaderBoard');
+          }else if(response.status===404){
+            navigate('/');
+            alert(data.message);
+          }else if(response.status===500){
+            navigate('/');
+            alert(data.message);
+          }else{
+            alert('Something went wrong, Please try again1!');
+          }
+        } catch (error) {
+          console.error(error);
+          alert('Something went wrong, Please try again!');
+        }
+    };
+
     useEffect(() => {
-        if (timer === 0) return;
+        if (timer === 0){
+            const timer = setTimeout(() => {
+                changeStatus();
+            }, 5000 );
+            return () => clearTimeout(timer);
+        };
 
         const interval = setInterval(() => {
             setTimer((prevTimer) => prevTimer - 1);
