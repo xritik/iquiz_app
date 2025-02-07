@@ -80,7 +80,7 @@ router.get('/status/:storedPin', async (req, res) => {
     const { storedPin } = req.params;
     const iquiz = await RunningIQuiz.findOne({ pin: storedPin });
     if(iquiz){
-        res.status(200).json({ status:iquiz.status, index:iquiz.shownQuestionIndex, timer:iquiz.shownQuestionTimer });
+        res.status(200).json({ status:iquiz.status, index:iquiz.shownQuestionIndex, timer:iquiz.shownQuestionTimer, id:iquiz.iquizId });
     }else if(!iquiz){
         res.status(400).json('None');
     }else{
@@ -104,6 +104,42 @@ router.post('/status', async (req, res) => {
         res.status(200).json({ message: 'Status updated successfully!' });
     } catch (error) {
         res.status(500).json({ message: 'Internal server error, Please try again!' });
+    }
+});
+
+router.post('/statusAnswering', async (req, res) => {
+    const { pin, status } = req.body;
+    
+    try {
+        const iquiz = await RunningIQuiz.findOneAndUpdate(
+            { pin: pin },  // Find the quiz by PIN
+            { $set: { status: status } }, // Update status
+            { new: true }  // Return the updated document
+        );
+        if (!iquiz) {
+            return res.status(404).json({ message: 'Quiz not found!' });
+        }
+
+        res.status(200).json({ message: 'Status updated successfully!' });
+    } catch (error) {
+        res.status(500).json({ message: 'Internal server error, Please try again!' });
+    }
+});
+
+router.post('/setMarks', async (req, res) => {
+    const { storedPin, storedName, myMarks, index } = req.body;
+    console.log(storedPin, storedName, myMarks, index)
+
+    try{
+        const updatedQuiz = await RunningIQuiz.findOneAndUpdate(
+            { pin: storedPin, "players.name": storedName },
+            {
+                $set: { [`players.$.scores.${index}`]: myMarks } // Updates if exists, inserts if not
+            },
+            { new: true }
+        );
+    }catch(error){
+        console.error(error);
     }
 });
 

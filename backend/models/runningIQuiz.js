@@ -16,7 +16,7 @@ const runningIQuizSchema = new mongoose.Schema({
     players: [
         {
             name: { type: String },
-            answers: { type: [Boolean], default: [] },
+            scores: { type: [Number], default: [] },
         }
     ],
     // shownQuestion: {

@@ -80,5 +80,26 @@ router.delete('/:id', async (req, res) => {
   }
 });
 
+router.get('/correctOptions/:startedIQuizId/:index', async (req, res) => {
+  const { startedIQuizId, index } = req.params;
+  try{
+    const iquiz = await IQuiz.findById( startedIQuizId );
+
+    if(!iquiz){
+      return res.status(404).json({ message: 'Started IQuiz not found!' });
+    }
+    const options = iquiz.questions[index].options;
+    const correctOptions = options
+      .map((option, index) => option.isCorrect ? index : null)
+      .filter(index => index !== null);
+
+    res.status(200).json({ correctOptions });
+
+  }catch (error) {
+    console.log(error);
+    res.status(500).json({ message: 'Internal server error!' });
+  }
+});
+
 
 module.exports = router;
