@@ -167,7 +167,7 @@ const ShowToPlayerPage = ({ navigate }) => {
                                     </div>
                                 </> :
         status === 'Loading' ? <div className='shownStatus'>Loading...</div>:
-        status === 'Answering' ?
+        status === ('Answering' || 'Finished') ?
                                 <div style={{display:`${time==0 ? 'flex' : 'none'}`}}>
                                     <div className='myoptions2' style={{display:'flex', flexDirection:'column', gap:'80px', justifyContent:'center', alignItems:'center'}}>
                                         <div>
@@ -188,7 +188,7 @@ const ShowToPlayerPage = ({ navigate }) => {
                                         </div>
                                     </div>
                                 </div>:
-        status === 'Finish' ? <div className='shownStatus'>This IQuiz is finished!</div> : <div className='shownStatus'>Something went wrong!</div>
+        status === 'Finished' ? <div className='shownStatus'>This IQuiz is finished!</div> : <div className='shownStatus'>Something went wrong!</div>
       }
     </div>
   )

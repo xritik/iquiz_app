@@ -4,10 +4,53 @@ const QuestionPage = ({ navigate }) => {
     const storedRunningIQuiz = JSON.parse(sessionStorage.getItem('runningIQuiz'));
     const [index, setIndex] = useState( sessionStorage.getItem('storedIndex') || 0 );
     const [activeClass, setActiveClass] = useState('');
-    const [timer, setTimer] = useState(storedRunningIQuiz.questions[index].timer);
-    const storedPin = localStorage.getItem('gamePin');
-    const savedIQuiz = JSON.parse(sessionStorage.getItem('runningIQuiz'));
+    const [timer, setTimer] = useState( sessionStorage.getItem('time') || storedRunningIQuiz.questions[index].timer );
+    const [status, setStatus] = useState('Started');
 
+    const storedPin = localStorage.getItem('gamePin');
+
+    useState(() => {
+        if(storedRunningIQuiz===null){
+            sessionStorage.removeItem('runningIQuiz');
+            sessionStorage.removeItem('storedIndex');
+            sessionStorage.removeItem('time');
+            localStorage.removeItem('gamePin');
+            navigate('/');
+        }
+        if(!(sessionStorage.getItem('storedIndex'))){
+            sessionStorage.setItem('storedIndex', 0);
+        };
+    }, [navigate]);
+
+    const getStatus = async () => {
+        const response = await fetch(`http://localhost:5000/runningIQuiz/status/${storedPin}`);
+        const data = await response.json();
+        if(data.status==='Answering'){
+            sessionStorage.setItem('time', 0);
+            setTimer(0);
+        }
+        
+        if(response.ok){
+            setStatus(data.status);
+            setIndex(data.index);
+        }else if(response.status===400){
+            sessionStorage.removeItem('runningIQuiz');
+            sessionStorage.removeItem('storedIndex');
+            sessionStorage.removeItem('time');
+            localStorage.removeItem('gamePin');
+            navigate('/');
+        };
+    };
+
+    useEffect(() => {
+        if (!storedPin) return;
+        
+        const intervalId = setInterval(() => {
+            getStatus();
+        }, 500);
+        
+        return () => clearInterval(intervalId);
+    }, [storedPin]);
 
     useEffect(() => {
         const timer = setTimeout(() => {
@@ -18,6 +61,7 @@ const QuestionPage = ({ navigate }) => {
     }, [ navigate ]);
 
     const changeStatus = async () => {
+        const myStatus = storedRunningIQuiz.questions.length>(index+1) ? 'Answering' : 'Finished'
         try {
           const response = await fetch('http://localhost:5000/runningIQuiz/statusAnswering',{
             method: 'POST',
@@ -52,6 +96,10 @@ const QuestionPage = ({ navigate }) => {
             return () => clearTimeout(timer);
         };
 
+        if(timer!=0){
+            sessionStorage.setItem('time', timer);
+        }
+
         const interval = setInterval(() => {
             setTimer((prevTimer) => prevTimer - 1);
         }, 1000);
@@ -61,12 +109,6 @@ const QuestionPage = ({ navigate }) => {
 
     
 
-    if(storedRunningIQuiz===null){
-        navigate('/');
-    }
-    if(!(sessionStorage.getItem('storedIndex'))){
-        sessionStorage.setItem('storedIndex', 0);
-    };
   return (
     <div className='showToPlayerSection'>
 
