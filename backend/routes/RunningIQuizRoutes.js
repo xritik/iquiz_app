@@ -80,7 +80,7 @@ router.get('/status/:storedPin', async (req, res) => {
     const { storedPin } = req.params;
     const iquiz = await RunningIQuiz.findOne({ pin: storedPin });
     if(iquiz){
-        res.status(200).json({ status:iquiz.status, index:iquiz.shownQuestionIndex, timer:iquiz.shownQuestionTimer, id:iquiz.iquizId });
+        res.status(200).json({ status:iquiz.status, index:iquiz.shownQuestionIndex, timer:iquiz.shownQuestionTimer, id:iquiz.iquizId, players:iquiz.players });
     }else if(!iquiz){
         res.status(400).json('None');
     }else{
@@ -128,7 +128,6 @@ router.post('/statusAnswering', async (req, res) => {
 
 router.post('/setMarks', async (req, res) => {
     const { storedPin, storedName, myMarks, index } = req.body;
-    console.log(storedPin, storedName, myMarks, index)
 
     try{
         const updatedQuiz = await RunningIQuiz.findOneAndUpdate(
