@@ -219,7 +219,7 @@ const Home = ({navigate, setShowSignUp}) => {
       if(response.ok){
         sessionStorage.setItem('playerName', playerName);
         sessionStorage.setItem('playerPin', playerPin);
-        navigate('/in-game')
+        navigate('/in-game');
       }else if(response.status===404){
         alert(data.message);
       }else if(response.status===409){
