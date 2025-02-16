@@ -55,7 +55,7 @@ router.post('/join', async (req, res) => {
                 return res.status(409).json({ message: 'This username has been already taken!' });
             }
     
-            res.status(200).json({ message: 'Player added successfully!', });
+            res.status(200).json({ status:runningIQuiz.status, message: 'Player added successfully!', });
         }else{
             res.status(404).json({ message: 'Please enter a valid game pin!' });
         }
