@@ -16,7 +16,7 @@ const LeaderBoard = ({ navigate }) => {
             localStorage.removeItem('gamePin');
             navigate('/');
         }
-    }, [navigate]);
+    }, [ navigate, storedPin ]);
 
     const getStatus = async () => {
         const response = await fetch(`http://localhost:5000/runningIQuiz/status/${storedPin}`);
@@ -72,7 +72,7 @@ const LeaderBoard = ({ navigate }) => {
         }, 500);
         
         return () => clearInterval(intervalId);
-    }, [storedPin]);
+    }, [ storedPin, getStatus ]);
 
   return (
     <div>

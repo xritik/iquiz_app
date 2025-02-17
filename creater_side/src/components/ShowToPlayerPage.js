@@ -5,19 +5,20 @@ const ShowToPlayerPage = ({ navigate }) => {
     const storedPin = sessionStorage.getItem('playerPin');
     const storedName = sessionStorage.getItem('playerName');
     const [status, setStatus] = useState('Loading');
+    const savedMarks = sessionStorage.getItem('currentMarks');
     const [index, setIndex] = useState(null);
     const [timer, setTimer] = useState(null);
     const [time, setTime] = useState( null );
     const [startedIQuizId, setStartedIQuizId] = useState('');
     const [selectedOption, setSelectedOption] = useState( JSON.parse(sessionStorage.getItem('selectedOption')) || null);
     const [correctOptions, setCorrectOptions] = useState([]);
-    const [marks, setMarks] = useState(sessionStorage.getItem('currentMarks') || '');
+    const [marks, setMarks] = useState( savedMarks || '');
 
     useEffect(() => {
         if(!storedName && !storedPin){
             navigate('/')
         };
-    },[ storedPin, storedName, status ]);
+    },[ storedPin, storedName, status, navigate ]);
 
     const handleExit = () => {
         const confirmation = window.confirm('Are you sure to exit the game!');
@@ -57,7 +58,7 @@ const ShowToPlayerPage = ({ navigate }) => {
     const handlemarks = async (myCorrectOptions) => {
         const myMarks = myCorrectOptions.includes(selectedOption) ? marks : 0;
         try{
-            const response = await fetch('http://localhost:5000/runningIQuiz/setMarks',{
+            await fetch('http://localhost:5000/runningIQuiz/setMarks',{
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -90,27 +91,36 @@ const ShowToPlayerPage = ({ navigate }) => {
         };
     };
 
+    useEffect(() => {
+        if(time===0){
+            if(correctOptions.includes(selectedOption)){
+                setMarks(savedMarks);
+            }else{
+                setMarks(0);
+            }
+        };
+    }, [ time, correctOptions, savedMarks, selectedOption ]);
 
     useEffect(() => {
         if(status==='Started'){
             setTime(timer);
         }else{
-            setTime(sessionStorage.getItem('time'));
-            setMarks(sessionStorage.getItem('currentMarks'));
+            setTime(Number(sessionStorage.getItem('time')));
+            setMarks(Number(sessionStorage.getItem('currentMarks')));
         }
     }, [timer]);
 
     useEffect(() => {
-        if(time==0 && (status==='Started' || status==='Answering')){
+        if(time===0 && (status==='Started' || status==='Answering')){
             getCorrectOptions();
         }
-    }, [ time, status ]);
+    }, [ time, status, getCorrectOptions ]);
 
 
     useEffect(() => {
         if (time <= 0 || null) return;
 
-        if(time!=0){
+        if(time!==0){
             sessionStorage.setItem('time', time);
         }
 
@@ -129,7 +139,7 @@ const ShowToPlayerPage = ({ navigate }) => {
         }, 500);
       
         return () => clearInterval(intervalId);
-    }, [storedPin]);
+    }, [ storedPin, getStatus ]);
 
     const handleSelectOption = (index) => {
         setSelectedOption(selectedOption===index ? null : index);
@@ -168,7 +178,7 @@ const ShowToPlayerPage = ({ navigate }) => {
                                 </> :
         status === 'Loading' ? <div className='shownStatus'>Loading...</div>:
         status === ('Answering' || 'Finished') ?
-                                <div style={{display:`${time==0 ? 'flex' : 'none'}`}}>
+                                <div style={{display:`${time===0 ? 'flex' : 'none'}`}}>
                                     <div className='myoptions2' style={{display:'flex', flexDirection:'column', gap:'80px', justifyContent:'center', alignItems:'center'}}>
                                         <div>
                                             <div style={{color:'#0ef', fontSize:'40px'}}>{correctOptions.includes(selectedOption) ? 'Correct Option Selected!' : 'Incorrect Option Selected!'}</div>
