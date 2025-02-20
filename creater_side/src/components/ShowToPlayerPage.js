@@ -10,7 +10,7 @@ const ShowToPlayerPage = ({ navigate }) => {
     const [timer, setTimer] = useState(null);
     const [time, setTime] = useState( null );
     const [startedIQuizId, setStartedIQuizId] = useState('');
-    const [selectedOption, setSelectedOption] = useState( JSON.parse(sessionStorage.getItem('selectedOption')) || null);
+    const [selectedOption, setSelectedOption] = useState( (sessionStorage.getItem('selectedOption')) || null);
     const [correctOptions, setCorrectOptions] = useState([]);
     const [marks, setMarks] = useState( savedMarks || '');
 
@@ -27,7 +27,8 @@ const ShowToPlayerPage = ({ navigate }) => {
             sessionStorage.removeItem('playerName');
             sessionStorage.removeItem('selectedOption');
             sessionStorage.removeItem('time');
-            sessionStorage.removeItem('currentMarks')
+            sessionStorage.removeItem('currentMarks');
+            sessionStorage.removeItem('storedIndex');
             navigate('/');
         }
     };
@@ -37,6 +38,10 @@ const ShowToPlayerPage = ({ navigate }) => {
         const data = await response.json();
         if(data.status==='Answering'){
             sessionStorage.setItem('time', 0);
+        }
+        if(data.timer==(sessionStorage.getItem('time'))){
+            sessionStorage.removeItem('selectedOption');
+            sessionStorage.removeItem('currentMarks');
         }
         
         if(response.ok){
@@ -49,14 +54,25 @@ const ShowToPlayerPage = ({ navigate }) => {
             sessionStorage.removeItem('playerName');
             sessionStorage.removeItem('selectedOption');
             sessionStorage.removeItem('time');
-            sessionStorage.removeItem('currentMarks')
+            sessionStorage.removeItem('currentMarks');
+            sessionStorage.removeItem('storedIndex');
             navigate('/');
         };
         // console.log(question);
     };
 
+    useEffect(() => {
+        if(time==0){
+            if(correctOptions.includes(Number(selectedOption))){
+                setMarks(savedMarks);
+            }else{
+                setMarks(0);
+            }
+        };
+    }, [ time, correctOptions ]);
+
     const handlemarks = async (myCorrectOptions) => {
-        const myMarks = myCorrectOptions.includes(selectedOption) ? marks : 0;
+        const myMarks = myCorrectOptions.includes(Number(selectedOption)) ? savedMarks : 0;
         try{
             await fetch('http://localhost:5000/runningIQuiz/setMarks',{
                 method: 'POST',
@@ -87,19 +103,9 @@ const ShowToPlayerPage = ({ navigate }) => {
             }
         }catch (error) {
             console.error(error);
-            alert('Somrthing went wrong');
+            alert('Something went wrong');
         };
     };
-
-    useEffect(() => {
-        if(time===0){
-            if(correctOptions.includes(selectedOption)){
-                setMarks(savedMarks);
-            }else{
-                setMarks(0);
-            }
-        };
-    }, [ time, correctOptions, savedMarks, selectedOption ]);
 
     useEffect(() => {
         if(status==='Started'){
@@ -108,13 +114,11 @@ const ShowToPlayerPage = ({ navigate }) => {
             setTime(Number(sessionStorage.getItem('time')));
             setMarks(Number(sessionStorage.getItem('currentMarks')));
         }
-    }, [timer]);
 
-    useEffect(() => {
-        if(time===0 && (status==='Started' || status==='Answering')){
+        if((time==0) && (status==='Answering')){
             getCorrectOptions();
         }
-    }, [ time, status, getCorrectOptions ]);
+    }, [timer, status]);
 
 
     useEffect(() => {
@@ -132,14 +136,16 @@ const ShowToPlayerPage = ({ navigate }) => {
     }, [ time ]);
 
     useEffect(() => {
-        if (!storedPin) return;
-      
         const intervalId = setInterval(() => {
-            getStatus();
+            if (storedPin) {
+                getStatus();
+            }
         }, 500);
-      
+
         return () => clearInterval(intervalId);
-    }, [ storedPin, getStatus ]);
+    }, []);
+
+    
 
     const handleSelectOption = (index) => {
         setSelectedOption(selectedOption===index ? null : index);
@@ -155,9 +161,9 @@ const ShowToPlayerPage = ({ navigate }) => {
         status === 'notStarted' ? <div className='shownStatus'>You are in the IQuiz, get ready for start!</div> :
         status === 'ShowingQuestion' ? <div className='shownStatus'>Get ready!</div>:
         status === 'Started' ? <>
-                                    <div className='shownStatus' style={{display:`${time===0 ? 'block' : 'none'}`}}>Loading...</div>
+                                    <div className='shownStatus' style={{display:`${time<=1 ? 'block' : 'none'}`}}>Loading...</div>
 
-                                    <div style={{display:`${time===0 ? 'none' : 'block'}`}}>
+                                    <div style={{display:`${time<=1 ? 'none' : 'block'}`}}>
                                         <div className='myoptions'>
                                             <div className='mytimer' style={{paddingLeft:'100px'}}>
                                                 <span>{time}</span>
@@ -166,7 +172,7 @@ const ShowToPlayerPage = ({ navigate }) => {
                                                 {["Option1", "Option2", "Option3", "Option4"].map((option, index) => (
                                                     <div 
                                                         key={index} 
-                                                        className={selectedOption === index ? 'myoption2Active' : ''} 
+                                                        className={sessionStorage.getItem('selectedOption') == index ? 'myoption2Active' : ''} 
                                                         onClick={() => handleSelectOption(index)}
                                                     >
                                                         {option}
@@ -177,19 +183,19 @@ const ShowToPlayerPage = ({ navigate }) => {
                                     </div>
                                 </> :
         status === 'Loading' ? <div className='shownStatus'>Loading...</div>:
-        status === ('Answering' || 'Finished') ?
-                                <div style={{display:`${time===0 ? 'flex' : 'none'}`}}>
+        status === 'Answering' ?
+                                <div style={{display:`${time==0 ? 'flex' : 'none'}`}}>
                                     <div className='myoptions2' style={{display:'flex', flexDirection:'column', gap:'80px', justifyContent:'center', alignItems:'center'}}>
                                         <div>
-                                            <div style={{color:'#0ef', fontSize:'40px'}}>{correctOptions.includes(selectedOption) ? 'Correct Option Selected!' : 'Incorrect Option Selected!'}</div>
-                                            <div style={{color:'#0ef', fontSize:'20px', fontWeight:'bold', marginTop:'10px'}}>Current Score:- <i>{correctOptions.includes(selectedOption) ? marks : 0}</i></div>
+                                            <div style={{color:'#0ef', fontSize:'40px'}}>{correctOptions.includes(Number(selectedOption)) ? 'Correct Option Selected!' : 'Incorrect Option Selected!'}</div>
+                                            <div style={{color:'#0ef', fontSize:'20px', fontWeight:'bold', marginTop:'10px'}}>Current Score:- <i>{correctOptions.includes(Number(selectedOption)) ? marks : 0}</i></div>
                                             <div style={{color:'#0ef', fontSize:'20px', fontWeight:'bold'}}>Total Score:- <i>1000</i></div>
                                         </div>
                                         <div className='myoption2'>
                                             {["Option1", "Option2", "Option3", "Option4"].map((option, index) => (
                                                 <div
                                                     key={index}
-                                                    className={` ${selectedOption === index && !correctOptions.includes(index) ? 'incorrectOption' : ''}
+                                                    className={` ${selectedOption == index && !correctOptions.includes(index) ? 'incorrectOption' : ''}
                                                                 ${correctOptions.includes(index) ? 'correctOption' : ''}`.trim()}
                                                 >
                                                     {option}
