@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 
-const QuestionPage = ({ navigate }) => {
+const QuestionPage = ({ hostName, navigate }) => {
     const storedRunningIQuiz = JSON.parse(sessionStorage.getItem('runningIQuiz'));
     const [index, setIndex] = useState( sessionStorage.getItem('storedIndex') || 0 );
     const [activeClass, setActiveClass] = useState('');
@@ -23,7 +23,7 @@ const QuestionPage = ({ navigate }) => {
     }, [navigate]);
 
     const getStatus = async () => {
-        const response = await fetch(`http://localhost:5000/runningIQuiz/status/${storedPin}`);
+        const response = await fetch(`http://${hostName}:5000/runningIQuiz/status/${storedPin}`);
         const data = await response.json();
         if(data.status==='Answering'){
             sessionStorage.setItem('time', 0);
@@ -63,7 +63,7 @@ const QuestionPage = ({ navigate }) => {
     const changeStatus = async () => {
         const myStatus = storedRunningIQuiz.questions.length>(index+1) ? 'Answering' : 'Finished'
         try {
-          const response = await fetch('http://localhost:5000/runningIQuiz/statusAnswering',{
+          const response = await fetch(`http://${hostName}:5000/runningIQuiz/statusAnswering`,{
             method: 'POST',
             headers: {
               'Content-Type': 'application/json'

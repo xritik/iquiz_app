@@ -12,19 +12,20 @@ import LeaderBoard from "./components/LeaderBoard.js";
 function App() {
   const navigate = useNavigate();
   const [showSignUp, setShowSignUp] = useState(false);
+  const hostName = 'localhost'; 
 
   return (
     <div className="App">
       <Routes>
-        <Route path={'/'} element={<Home navigate={navigate} setShowSignUp={setShowSignUp} />} />
-        <Route path={'/home'} element={<Home navigate={navigate} setShowSignUp={setShowSignUp} />} />
-        <Route path={'/login_signUp'} element={<Login_Signup navigate={navigate} showSignUp={showSignUp} setShowSignUp={setShowSignUp} />} />
-        <Route path={'/adding_iquiz'} element={<IQuizCreationPage navigate={navigate} />} />
-        <Route path={'/editing_iquiz'} element={<IQuizEditionPage navigate={navigate} />} />
-        <Route path={'/in-game'} element={<ShowToPlayerPage navigate={navigate} />} />
-        <Route path={'/question'} element={<QuestionPage navigate={navigate} />} />
-        <Route path={'/leaderBoard'} element={<LeaderBoard navigate={navigate} />} />
-        <Route path={'*'} element={<NotFoundPage navigate={navigate} />}/>
+        <Route path={'/'} element={<Home hostName={hostName} navigate={navigate} setShowSignUp={setShowSignUp} />} />
+        <Route path={'/home'} element={<Home hostName={hostName} navigate={navigate} setShowSignUp={setShowSignUp} />} />
+        <Route path={'/login_signUp'} element={<Login_Signup hostName={hostName} navigate={navigate} showSignUp={showSignUp} setShowSignUp={setShowSignUp} />} />
+        <Route path={'/adding_iquiz'} element={<IQuizCreationPage hostName={hostName} navigate={navigate} />} />
+        <Route path={'/editing_iquiz'} element={<IQuizEditionPage hostName={hostName} navigate={navigate} />} />
+        <Route path={'/in-game'} element={<ShowToPlayerPage hostName={hostName} navigate={navigate} />} />
+        <Route path={'/question'} element={<QuestionPage hostName={hostName} navigate={navigate} />} />
+        <Route path={'/leaderBoard'} element={<LeaderBoard hostName={hostName} navigate={navigate} />} />
+        <Route path={'*'} element={<NotFoundPage hostName={hostName} navigate={navigate} />}/>
       </Routes>
     </div>
   );

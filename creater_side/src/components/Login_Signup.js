@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom';
 import '../css/login_signup.css';
 
-const Login_Signup = ({navigate, showSignUp, setShowSignUp}) => {
+const Login_Signup = ({ hostName, navigate, showSignUp, setShowSignUp }) => {
 
   const [name, setName] = useState('');
   const [password, setPassword] = useState('');
@@ -17,7 +17,7 @@ const Login_Signup = ({navigate, showSignUp, setShowSignUp}) => {
   const handleSignup = async () => {
 
     try {
-      const response = await fetch('http://localhost:5000/signUp', {
+      const response = await fetch(`http://${hostName}:5000/signUp`, {
         method: 'POST',
         headers:{
           'Content-Type': 'application/json'
@@ -45,7 +45,7 @@ const Login_Signup = ({navigate, showSignUp, setShowSignUp}) => {
 
   const handleLogin = async () => {
     try {
-      const response = await fetch('http://localhost:5000/login', {
+      const response = await fetch(`http://${hostName}:5000/login`, {
         method: 'POST',
         headers:{
           'Content-Type': 'application/json'

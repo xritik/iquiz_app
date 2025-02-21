@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 
-const Home = ({navigate, setShowSignUp}) => {
+const Home = ({ hostName, navigate, setShowSignUp }) => {
 
   const loggedinUser = localStorage.getItem('IQuiz_loginName')
   const [isProfileCard, setIsProfileCard] = useState(false);
@@ -16,7 +16,7 @@ const Home = ({navigate, setShowSignUp}) => {
   // const handleJoinGame = async() => {
   //   window.open('http://localhost:3001/');
   //   try {
-  //     const response = await fetch('http://localhost:5000/start-game', {
+  //     const response = await fetch(`http://${hostName}:5000/start-game`, {
   //       method: 'POST',
   //     });
 
@@ -48,7 +48,7 @@ const Home = ({navigate, setShowSignUp}) => {
 
   const fetchIQuizzes = async () => {
     try {
-      const response = await fetch(`http://localhost:5000/iquiz/${loggedinUser}`);
+      const response = await fetch(`http://${hostName}:5000/iquiz/${loggedinUser}`);
       const data = await response.json();
       if(response.ok){
         setIquizzes(data);
@@ -82,7 +82,7 @@ const Home = ({navigate, setShowSignUp}) => {
 
     if(confirmation){
       try {
-        const response = await fetch(`http://localhost:5000/iquiz/${id}`,{
+        const response = await fetch(`http://${hostName}:5000/iquiz/${id}`,{
           method: 'DELETE'
         });
         const data = await response.json();
@@ -107,7 +107,7 @@ const Home = ({navigate, setShowSignUp}) => {
     const confirmation = window.confirm('Are you sure to stop hosting of this IQuiz?');
     if(confirmation){
       try {
-        const response = await fetch(`http://localhost:5000/runningIQuiz/delete/${pin}`,{
+        const response = await fetch(`http://${hostName}:5000/runningIQuiz/delete/${pin}`,{
           method: 'DELETE'
         });
         const data = await response.json();
@@ -134,7 +134,7 @@ const Home = ({navigate, setShowSignUp}) => {
 
   const getPlayers = async () => {
     try {
-      const response = await fetch(`http://localhost:5000/runningIQuiz/players/${storedPin}`);
+      const response = await fetch(`http://${hostName}:5000/runningIQuiz/players/${storedPin}`);
       const data = await response.json();
       // console.log(data)
       if(response.ok){
@@ -177,7 +177,7 @@ const Home = ({navigate, setShowSignUp}) => {
         localStorage.setItem('gamePin', pin);
 
         try {
-          const response = await fetch(`http://localhost:5000/runningIQuiz/host`,{
+          const response = await fetch(`http://${hostName}:5000/runningIQuiz/host`,{
             method: 'POST',
             headers:{
               'Content-Type': 'application/json'
@@ -208,7 +208,7 @@ const Home = ({navigate, setShowSignUp}) => {
 
   const handleJoin = async () => {
     try {
-      const response = await fetch('http://localhost:5000/runningIQuiz/join',{
+      const response = await fetch(`http://${hostName}:5000/runningIQuiz/join`,{
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -238,7 +238,7 @@ const Home = ({navigate, setShowSignUp}) => {
   const handleStart = async () => {
     const savedIQuiz = JSON.parse(sessionStorage.getItem('runningIQuiz'));
     try {
-      const response = await fetch('http://localhost:5000/runningIQuiz/status',{
+      const response = await fetch(`http://${hostName}:5000/runningIQuiz/status`,{
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 
-const LeaderBoard = ({ navigate }) => {
+const LeaderBoard = ({ hostName, navigate }) => {
     const storedRunningIQuiz = JSON.parse(sessionStorage.getItem('runningIQuiz'));
     const storedIndex = sessionStorage.getItem('storedIndex');
     const storedPin = localStorage.getItem('gamePin');
@@ -19,7 +19,7 @@ const LeaderBoard = ({ navigate }) => {
     }, [ navigate, storedPin ]);
 
     const getStatus = async () => {
-        const response = await fetch(`http://localhost:5000/runningIQuiz/status/${storedPin}`);
+        const response = await fetch(`http://${hostName}:5000/runningIQuiz/status/${storedPin}`);
         const data = await response.json();
         
         if(response.ok){
@@ -39,7 +39,7 @@ const LeaderBoard = ({ navigate }) => {
         const newIndex = index+1;
         const newTime = storedRunningIQuiz.questions[newIndex].timer;
         try {
-            const response = await fetch('http://localhost:5000/runningIQuiz/status',{
+            const response = await fetch(`http://${hostName}:5000/runningIQuiz/status`,{
                 method: 'POST',
                 headers: {
                 'Content-Type': 'application/json'

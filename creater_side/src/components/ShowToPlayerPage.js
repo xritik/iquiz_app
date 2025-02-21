@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import  '../css/showToPlayer_page.css';
 
-const ShowToPlayerPage = ({ navigate }) => {
+const ShowToPlayerPage = ({ hostName, navigate }) => {
     const storedPin = sessionStorage.getItem('playerPin');
     const storedName = sessionStorage.getItem('playerName');
     const [status, setStatus] = useState('Loading');
@@ -13,6 +13,7 @@ const ShowToPlayerPage = ({ navigate }) => {
     const [selectedOption, setSelectedOption] = useState( (sessionStorage.getItem('selectedOption')) || null);
     const [correctOptions, setCorrectOptions] = useState([]);
     const [marks, setMarks] = useState( savedMarks || '');
+    const [myScores, setMyScores] = useState( JSON.parse(sessionStorage.getItem('myScores')) || [] ); 
 
     useEffect(() => {
         if(!storedName && !storedPin){
@@ -34,7 +35,7 @@ const ShowToPlayerPage = ({ navigate }) => {
     };
 
     const getStatus = async () => {
-        const response = await fetch(`http://localhost:5000/runningIQuiz/status/${storedPin}`);
+        const response = await fetch(`http://${hostName}:5000/runningIQuiz/status/${storedPin}`);
         const data = await response.json();
         if(data.status==='Answering'){
             sessionStorage.setItem('time', 0);
@@ -42,6 +43,7 @@ const ShowToPlayerPage = ({ navigate }) => {
         if(data.timer==(sessionStorage.getItem('time'))){
             sessionStorage.removeItem('selectedOption');
             sessionStorage.removeItem('currentMarks');
+            setSelectedOption(null);
         }
         
         if(response.ok){
@@ -74,13 +76,18 @@ const ShowToPlayerPage = ({ navigate }) => {
     const handlemarks = async (myCorrectOptions) => {
         const myMarks = myCorrectOptions.includes(Number(selectedOption)) ? savedMarks : 0;
         try{
-            await fetch('http://localhost:5000/runningIQuiz/setMarks',{
+            const response = await fetch(`http://${hostName}:5000/runningIQuiz/setMarks`,{
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({ storedPin, storedName, myMarks, index })
             });
+            const data = await response.json();
+            if(response.ok){
+                setMyScores(data.scores);
+                // sessionStorage.setItem('myScores', JSON.stringify(data.scores));
+            };
         }catch(error){
             console.error(error);
         }
@@ -88,7 +95,7 @@ const ShowToPlayerPage = ({ navigate }) => {
 
     const getCorrectOptions = async () => {
         try{
-            const response = await fetch(`http://localhost:5000/iquiz/correctOptions/${startedIQuizId}/${index}`);
+            const response = await fetch(`http://${hostName}:5000/iquiz/correctOptions/${startedIQuizId}/${index}`);
             const data = await response.json();
             // console.log(data.correctOptions);
             if(response.ok){
@@ -161,9 +168,9 @@ const ShowToPlayerPage = ({ navigate }) => {
         status === 'notStarted' ? <div className='shownStatus'>You are in the IQuiz, get ready for start!</div> :
         status === 'ShowingQuestion' ? <div className='shownStatus'>Get ready!</div>:
         status === 'Started' ? <>
-                                    <div className='shownStatus' style={{display:`${time<=1 ? 'block' : 'none'}`}}>Loading...</div>
+                                    <div className='shownStatus' style={{display:`${time==0 ? 'block' : 'none'}`}}>Loading...</div>
 
-                                    <div style={{display:`${time<=1 ? 'none' : 'block'}`}}>
+                                    <div style={{display:`${time==0 ? 'none' : 'block'}`}}>
                                         <div className='myoptions'>
                                             <div className='mytimer' style={{paddingLeft:'100px'}}>
                                                 <span>{time}</span>
@@ -172,7 +179,7 @@ const ShowToPlayerPage = ({ navigate }) => {
                                                 {["Option1", "Option2", "Option3", "Option4"].map((option, index) => (
                                                     <div 
                                                         key={index} 
-                                                        className={sessionStorage.getItem('selectedOption') == index ? 'myoption2Active' : ''} 
+                                                        className={selectedOption == index ? 'myoption2Active' : ''} 
                                                         onClick={() => handleSelectOption(index)}
                                                     >
                                                         {option}
@@ -189,7 +196,7 @@ const ShowToPlayerPage = ({ navigate }) => {
                                         <div>
                                             <div style={{color:'#0ef', fontSize:'40px'}}>{correctOptions.includes(Number(selectedOption)) ? 'Correct Option Selected!' : 'Incorrect Option Selected!'}</div>
                                             <div style={{color:'#0ef', fontSize:'20px', fontWeight:'bold', marginTop:'10px'}}>Current Score:- <i>{correctOptions.includes(Number(selectedOption)) ? marks : 0}</i></div>
-                                            <div style={{color:'#0ef', fontSize:'20px', fontWeight:'bold'}}>Total Score:- <i>1000</i></div>
+                                            <div style={{color:'#0ef', fontSize:'20px', fontWeight:'bold'}}>Total Score:- <i>{myScores.reduce((acc, score) => acc + score, 0)}/{myScores.length}</i></div>
                                         </div>
                                         <div className='myoption2'>
                                             {["Option1", "Option2", "Option3", "Option4"].map((option, index) => (

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 
-const IQuizEditionPage = ({ navigate }) => {
+const IQuizEditionPage = ({ hostName, navigate }) => {
     const loggedinUser = localStorage.getItem('IQuiz_loginName');
     const storedIQuiz = JSON.parse(localStorage.getItem('editingIQuiz')) || [];
     const [iquizTitle, setIquizTitle] = useState(storedIQuiz.title || '');
@@ -100,7 +100,7 @@ const IQuizEditionPage = ({ navigate }) => {
         const quizData = { user: loggedinUser, title: iquizTitle, questions: iquizQuestions };
 
         try{
-            const response = await fetch(`http://localhost:5000/iquiz/${storedIQuiz._id}`, {
+            const response = await fetch(`http://${hostName}:5000/iquiz/${storedIQuiz._id}`, {
                 method: 'POST',
                 headers:{
                 'Content-Type': 'application/json'
