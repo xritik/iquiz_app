@@ -275,7 +275,7 @@ const Home = ({ hostName, navigate, setShowSignUp }) => {
       </>}
 
       <div className='popupSection' style={{display: `${ crossClicked ? 'flex' : 'none'}`}}>
-        <div className='popupCard'>
+        <div className='popupCard width95'>
           <i className='bx bx-x cross cross1' onClick={() => handleCross(iquizPin)}></i>
           <h1 style={{textAlign:'center'}}>Waiting for players...</h1>
           <p style={{fontSize:'30px', color:'gray'}}>Your game pin is:- <strong style={{color:'green'}}>{iquizPin}</strong></p>

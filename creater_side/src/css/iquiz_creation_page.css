@@ -360,3 +360,95 @@
         color: rgb(59, 59, 59);
     }
 }
+.iquizCreationPart1Phone{
+    display: none;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+@media only screen and (max-width: 768px){
+    .iquizCreationPart1{
+        display: none;
+    }
+    .iquizCreationPart2{
+        width: 100vw;
+    }
+    .title_button{
+        padding: 20px 15px;
+    }
+    .title_button .part1{
+        width: 65%;
+    }
+    .title_button .part2{
+        right: 15px;
+        button{
+            font-size: 17px;
+            padding: 6px 12px 6px 12px;
+        }
+    }
+    .question_timer{
+        padding-top: 20px;
+    }
+    .question_timer .part1{
+        font-size: 25px;
+    }
+    .question_timer .part2{
+        width: 60%;
+        textarea{
+            font-size: 20px;
+        }
+    }
+    .question_timer .part3{
+        width: 25%;
+        select{
+            font-size: 11px;
+            padding: 5px 7px 5px 7px;
+        }
+    }
+    .optionSection{
+        padding: 70px 7% 0px;
+    }
+    .options {
+        flex-direction: column;
+        gap: 10px;
+        padding: 5px 0;
+    }
+    .option {
+        width: 100%;
+        border-radius: 10px;
+    }
+    .selectOption{
+        margin-top: 5px;
+        margin-right: 5px;
+    }
+    .iquizCreationPart1Phone{
+        width: 200px;
+        height: 100vh;
+        padding-top: 60px !important;
+        gap: 15px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        overflow-y: auto;
+        scrollbar-width: none;
+        /* background-color: red; */
+        /* height: 50vh; */
+        /* width: 50vw; */
+        padding: 20px;
+        display: block;
+        background: #081b29;
+        position: fixed;
+        z-index: 10;
+        right: 0;
+        border: 1px solid red;
+    }
+}

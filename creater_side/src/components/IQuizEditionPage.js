@@ -24,6 +24,7 @@ const IQuizEditionPage = ({ hostName, navigate }) => {
     const [currentQuestion, setCurrentQuestion] = useState(0);
     const [errorsState, setErrorsState] = useState([]);
     const [crossClicked, setCrossClicked] = useState(false);
+    const [clicked, setClicked] = useState(false);
     
     useEffect(() => {
         if( !loggedinUser ){
@@ -219,8 +220,46 @@ const IQuizEditionPage = ({ hostName, navigate }) => {
         </div>
       </div>
 
+      <div className='iquizCreationPart1Phone' style={{display:`${clicked?'none':'flex'}`}}>
+        <i className='bx bx-x cross cross1' onClick={()=>setClicked(!clicked)} style={{color:'#ccc'}}></i>
+        {iquizQuestions.map((quiz, index) => (
+          <div key={index} className="questions">
+            <div className='delIcon'>
+                <i className='bx bxs-trash' onClick={() => handleDelete(index)} style={{color:`${currentQuestion===index ? 'red' : 'transparent'}`}}></i>
+            </div>
+            <div onClick={() => setCurrentQuestion(index)} className="question" style={{borderColor:`${currentQuestion===index ? '#0ef' : '#ccc'}`, color:`${currentQuestion===index ? '#0ef' : '#ccc'}`}}>
+              <div className='mini_qNo'>
+                Q{index + 1}.
+                <div className='mini_timer'>{quiz.timer==='' ? 'T' : quiz.timer}</div>
+              </div>
+              <div className='mini_question'>{ quiz.question.trim().length===0 ? <div className='mini_box'></div> : (quiz.question.length > 18 ? quiz.question.slice(0, 18)+'...' : quiz.question) }</div>
+              <div className='mini_options'>
+                <div className='mini_option'>
+                    {quiz.options[0].isCorrect && <div className='mini_correctOption'></div>}
+                </div>
+                <div className='mini_option'>
+                    {quiz.options[1].isCorrect && <div className='mini_correctOption'></div>}
+                </div>
+              </div>
+              <div className='mini_options'>
+                <div className='mini_option'>
+                    {quiz.options[2].isCorrect && <div className='mini_correctOption'></div>}
+                </div>
+                <div className='mini_option'>
+                    {quiz.options[3].isCorrect && <div className='mini_correctOption'></div>}
+                </div>
+              </div>
+            </div>
+          </div>
+        ))}
+        <div onClick={addEmptyQuestion} className="addMoreBtn" style={{textAlign:'center', marginTop:'20px'}}>
+          Add More
+        </div>
+      </div>
+
       <div className="iquizCreationPart2">
       <i className='bx bx-arrow-back back_arrow back_arrow1' onClick={() => {navigate('/'); localStorage.removeItem('editingIQuiz')}}></i>
+      <i className='bx bx-menu back_arrow back_arrow1' onClick={()=>setClicked(!clicked)} style={{left:'80%'}}></i>
         <form
           className="addingIQuizForm"
           onSubmit={(e) => {

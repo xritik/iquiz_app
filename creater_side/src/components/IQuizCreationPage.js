@@ -19,6 +19,7 @@ const QuizCreation = ({ hostName, navigate }) => {
   const [errorsState, setErrorsState] = useState([]);
   const [crossClicked, setCrossClicked] = useState(false);
   const loggedinUser = localStorage.getItem('IQuiz_loginName');
+  const [clicked, setClicked] = useState(false);
     
     useEffect(() => {
         if( !loggedinUser ){
@@ -143,36 +144,36 @@ const QuizCreation = ({ hostName, navigate }) => {
 
   return (
     <div className="iquizCreationSection">
-        <div className='popupSection' style={{display: `${ crossClicked ? 'flex' : 'none'}`}}>
-          <div className='popupCard'>
-            <i className='bx bx-x cross cross1' onClick={handleClick}></i>
-            <h1>This IQuiz can't be saved!</h1>
-            <p>All questions need to be completed before you can start saving.</p>
-            {errorsState.map((items, i) =>{
-              if(
-                  items.question === null &&
-                  items.timer === null &&
-                  items.option === null &&
-                  items.currectOption === null
-              ){
-                  return null;
-              }
-              return(
-                <div className="emptySection" key={i}>
-                  <div className="emptyQue_no">Q{i + 1}.</div>
-                  <div className="emptyQuestions">
-                    <ul>
-                        {items.question && <li>{items.question}</li>}
-                        {items.timer && <li>{items.timer}</li>}
-                        {items.option && <li>{items.option}</li>}
-                        {items.currectOption && <li>{items.currectOption}</li>}
-                    </ul>
-                  </div>
+      <div className='popupSection' style={{display: `${ crossClicked ? 'flex' : 'none'}`}}>
+        <div className='popupCard width95'>
+          <i className='bx bx-x cross cross1' onClick={handleClick}></i>
+          <h1>This IQuiz can't be saved!</h1>
+          <p>All questions need to be completed before you can start saving.</p>
+          {errorsState.map((items, i) =>{
+            if(
+                items.question === null &&
+                items.timer === null &&
+                items.option === null &&
+                items.currectOption === null
+            ){
+                return null;
+            }
+            return(
+              <div className="emptySection" key={i}>
+                <div className="emptyQue_no">Q{i + 1}.</div>
+                <div className="emptyQuestions">
+                  <ul>
+                      {items.question && <li>{items.question}</li>}
+                      {items.timer && <li>{items.timer}</li>}
+                      {items.option && <li>{items.option}</li>}
+                      {items.currectOption && <li>{items.currectOption}</li>}
+                  </ul>
                 </div>
-              );
-            })}
-          </div>
+              </div>
+            );
+          })}
         </div>
+      </div>
       <div className="iquizCreationPart1">
         {iquizQuestions.map((quiz, index) => (
           <div key={index} className="questions">
@@ -209,8 +210,46 @@ const QuizCreation = ({ hostName, navigate }) => {
         </div>
       </div>
 
+      <div className='iquizCreationPart1Phone' style={{display:`${clicked?'none':'flex'}`}}>
+        <i className='bx bx-x cross cross1' onClick={()=>setClicked(!clicked)} style={{color:'#ccc'}}></i>
+        {iquizQuestions.map((quiz, index) => (
+          <div key={index} className="questions">
+            <div className='delIcon'>
+                <i className='bx bxs-trash' onClick={() => handleDelete(index)} style={{color:`${currentQuestion===index ? 'red' : 'transparent'}`}}></i>
+            </div>
+            <div onClick={() => setCurrentQuestion(index)} className="question" style={{borderColor:`${currentQuestion===index ? '#0ef' : '#ccc'}`, color:`${currentQuestion===index ? '#0ef' : '#ccc'}`}}>
+              <div className='mini_qNo'>
+                Q{index + 1}.
+                <div className='mini_timer'>{quiz.timer==='' ? 'T' : quiz.timer}</div>
+              </div>
+              <div className='mini_question'>{ quiz.question.trim().length===0 ? <div className='mini_box'></div> : (quiz.question.length > 18 ? quiz.question.slice(0, 18)+'...' : quiz.question) }</div>
+              <div className='mini_options'>
+                <div className='mini_option'>
+                    {quiz.options[0].isCorrect && <div className='mini_correctOption'></div>}
+                </div>
+                <div className='mini_option'>
+                    {quiz.options[1].isCorrect && <div className='mini_correctOption'></div>}
+                </div>
+              </div>
+              <div className='mini_options'>
+                <div className='mini_option'>
+                    {quiz.options[2].isCorrect && <div className='mini_correctOption'></div>}
+                </div>
+                <div className='mini_option'>
+                    {quiz.options[3].isCorrect && <div className='mini_correctOption'></div>}
+                </div>
+              </div>
+            </div>
+          </div>
+        ))}
+        <div onClick={addEmptyQuestion} className="addMoreBtn" style={{textAlign:'center', marginTop:'20px'}}>
+          Add More
+        </div>
+      </div>
+
       <div className="iquizCreationPart2">
-      <i className='bx bx-arrow-back back_arrow back_arrow1' onClick={() => {navigate('/')}}></i>
+        <i className='bx bx-arrow-back back_arrow back_arrow1' onClick={() => {navigate('/')}}></i>
+        <i className='bx bx-menu back_arrow back_arrow1' onClick={()=>setClicked(!clicked)} style={{left:'80%'}}></i>
         <form
           className="addingIQuizForm"
           onSubmit={(e) => {
@@ -236,7 +275,7 @@ const QuizCreation = ({ hostName, navigate }) => {
           {currentQuestion !== null && (
             <div>
               <div className="question_timer">
-                <div className="part1">Q{currentQuestion + 1}</div>
+                <div className="part1">Q{currentQuestion + 1}.</div>
                 <div className="part2">
                   <textarea
                     type="text"

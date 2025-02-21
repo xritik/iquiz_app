@@ -334,8 +334,8 @@ hr{
 }
 footer{
   padding: 20px;
-  display: flex;
   width: 100vw;
+  display: flex;
   color: #fff;
 }
 .footer1{
@@ -460,5 +460,82 @@ a:hover{
   p{
     font-size: 22px !important;
     font-weight: bold;
+  }
+}
+
+
+
+
+
+
+
+
+
+
+@media only screen and (max-width: 768px){
+  .nav1, .nav2, .nav3{
+    width: 33.33%;
+  }
+  .iquizStoreSection{
+    padding: 0;
+  }
+  .iquizDiv{
+    width: 97%;
+    padding: 10px 0px 10px 15px;
+    margin-top: 7px;
+  }
+  .iquizPart1{
+    width: 60%;
+  }
+  .titleDiv{
+    font-size: 19px;
+  }
+  .questionsDiv{
+    font-size: 14px;
+    padding-top: 10px;
+  }
+  .iquizPart2{
+    width: auto;
+    gap: 5px;
+  }
+  .hostButton{
+    padding: 7px 10px;
+    border-radius: 14px;
+    font-size: 14px;
+  }
+  .editDeleteIcons{
+    width: auto;
+    justify-content: center;
+    font-size: 22px;
+  }
+  footer{
+    padding: 10px;
+  }
+  .footer1{
+    width: 25%;
+    font-size: 15px;
+  }
+  .footer2{
+    width: 45%;
+    font-size: 35px;
+  }
+  .socialMedia{
+    width: 30%;
+  }
+  .media{
+    height: 30px;
+    width: 30px;
+    font-size: 17px;
+    border: 1px solid #0ef;
+  }
+  .width95{
+    width: 95vw !important;
+  }
+  .startStopButtons{
+    margin-top: 0;
+    button{
+      padding: 7px 15px;
+      font-size: 16px;
+    }
   }
 }
