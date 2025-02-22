@@ -5,12 +5,12 @@ const app = express();
 const PORT = 5000;
 require('./db');
 
-const corsOptions = {
-    origin: '*',  // Allow only requests from this origin
-    methods: ['GET', 'POST', 'PUT', 'DELETE'],
-    credentials: true,                // Allow credentials (cookies) to be sent
-};
-app.use(cors(corsOptions));
+// const corsOptions = {
+//     origin: '*',  // Allow only requests from this origin
+//     methods: ['GET', 'POST', 'PUT', 'DELETE'],
+//     credentials: true,                // Allow credentials (cookies) to be sent
+// };
+app.use(cors({origin: '*'}));
 
 app.use(express.json());
 

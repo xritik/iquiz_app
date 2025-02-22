@@ -137,6 +137,8 @@ router.post('/setMarks', async (req, res) => {
             },
             { new: true }
         );
+        const marks = updatedQuiz.players.filter((player) => player.name==storedName);
+        res.status(200).json({ scores: marks[0].scores });
     }catch(error){
         console.error(error);
     }
