@@ -13,6 +13,7 @@ function App() {
   const navigate = useNavigate();
   const [showSignUp, setShowSignUp] = useState(false);
   const hostName = 'localhost'; 
+  // const hostName = '192.168.128.96'; 
 
   return (
     <div className="App">

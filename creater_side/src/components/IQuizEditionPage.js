@@ -155,7 +155,7 @@ const IQuizEditionPage = ({ hostName, navigate }) => {
   return (
     <div className="iquizCreationSection">
         <div className='popupSection' style={{display: `${ crossClicked ? 'flex' : 'none'}`}}>
-            <div className='popupCard'>
+            <div className='popupCard width95'>
                 <i className='bx bx-x cross cross1' onClick={handleClick}></i>
                 <h1>This IQuiz can't be edited!</h1>
                 <p>All questions need to be completed before you can start editing.</p>
