@@ -473,8 +473,17 @@ a:hover{
 
 
 @media only screen and (max-width: 768px){
-  .nav1, .nav2, .nav3{
-    width: 33.33%;
+  .nav1{
+    width: 30%;
+  }
+  .nav2{
+    width: 20%;
+  }
+  .nav3{
+    width: 50%;
+  }
+  .profile{
+    margin-left: 60px;
   }
   .iquizStoreSection{
     padding: 0;
