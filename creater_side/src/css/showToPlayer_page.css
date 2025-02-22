@@ -131,4 +131,12 @@
     .resultT2, .resultT3{
         font-size: 17px;
     }
+
+
+    .myshowQuestion{
+        font-size: 25px;
+    }
+    .mytimer{
+        margin-top: 55px;
+    }
 }
