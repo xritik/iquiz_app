@@ -99,3 +99,36 @@
     background-color: red;
     color: #081b29 !important;
 }
+.resultT1{
+    color: #0ef;
+    font-size: 40px;
+}
+.resultT2, .resultT3{
+    color: #0ef;
+    font-size: 20px;
+    font-weight: bold;
+}
+
+
+
+
+@media only screen and (max-width: 768px){
+    .shownStatus{
+        font-size: 25px;
+    }
+    .myoption, .myoption2 {
+        flex-direction: column;
+    }
+    .myoption div, .myoption2 div {
+        width: 100%;
+        padding: 12px 80px;
+        font-size: 20px;
+    }
+    .resultT1{
+        font-size: 23px;
+        font-weight: bold;
+    }
+    .resultT2, .resultT3{
+        font-size: 17px;
+    }
+}

@@ -194,9 +194,9 @@ const ShowToPlayerPage = ({ hostName, navigate }) => {
                                 <div style={{display:`${time==0 ? 'flex' : 'none'}`}}>
                                     <div className='myoptions2' style={{display:'flex', flexDirection:'column', gap:'80px', justifyContent:'center', alignItems:'center'}}>
                                         <div>
-                                            <div style={{color:'#0ef', fontSize:'40px'}}>{correctOptions.includes(Number(selectedOption)) ? 'Correct Option Selected!' : 'Incorrect Option Selected!'}</div>
-                                            <div style={{color:'#0ef', fontSize:'20px', fontWeight:'bold', marginTop:'10px'}}>Current Score:- <i>{correctOptions.includes(Number(selectedOption)) ? marks : 0}</i></div>
-                                            <div style={{color:'#0ef', fontSize:'20px', fontWeight:'bold'}}>Total Score:- <i>{myScores.reduce((acc, score) => acc + score, 0)}/{myScores.length}</i></div>
+                                            <div className='resultT1'>{selectedOption ? (correctOptions.includes(Number(selectedOption)) ? 'Correct Option Selected!' : 'Incorrect Option Selected!') : 'No Option Selected!'}</div>
+                                            <div className='resultT2' style={{marginTop:'10px'}}>Current Score:- <i>{correctOptions.includes(Number(selectedOption)) ? marks : 0}</i></div>
+                                            <div className='resultT3'>Total Score:- <i>{myScores.reduce((acc, score) => acc + score, 0)}/{myScores.length}</i></div>
                                         </div>
                                         <div className='myoption2'>
                                             {["Option1", "Option2", "Option3", "Option4"].map((option, index) => (
