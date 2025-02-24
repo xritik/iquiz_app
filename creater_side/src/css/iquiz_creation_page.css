@@ -361,10 +361,11 @@
     }
 }
 .iquizCreationPart1Phone{
-    display: none;
+    display: none !important;
 }
-
-
+.hidden {
+    display: none !important;
+}
 
 
 
@@ -432,23 +433,19 @@
     }
     .iquizCreationPart1Phone{
         width: 200px;
-        height: 100vh;
+        height: auto;
         padding-top: 60px !important;
         gap: 15px;
-        display: flex;
+        display: flex !important;
         flex-direction: column;
         align-items: center;
         overflow-y: auto;
         scrollbar-width: none;
-        /* background-color: red; */
-        /* height: 50vh; */
-        /* width: 50vw; */
         padding: 20px;
-        display: block;
-        background: #081b29;
+        background: #0f3550;
+        border-bottom-left-radius: 25px;
         position: fixed;
         z-index: 10;
         right: 0;
-        border: 1px solid red;
     }
 }
