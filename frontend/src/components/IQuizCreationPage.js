@@ -211,7 +211,7 @@ const QuizCreation = ({ hostName, navigate }) => {
       </div>
 
       {/* <div className='iquizCreationPart1Phone' style={{display:`${clicked?'none':''}`}}> */}
-      <div className={`iquizCreationPart1Phone ${clicked ? 'hidden' : ''}`}>
+      <div className={`iquizCreationPart1Phone ${clicked ? '' : 'hidden'}`}>
         <i className='bx bx-x cross cross1' onClick={()=>setClicked(!clicked)} style={{color:'#ccc'}}></i>
         {iquizQuestions.map((quiz, index) => (
           <div key={index} className="questions">
