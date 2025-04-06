@@ -56,9 +56,13 @@ const IQuizEditionPage = ({ hostName, navigate }) => {
     };
 
     const handleSetCorrectOption = (index, Index) => {
-    const updatedQuestions = [...iquizQuestions];
-    updatedQuestions[Index].options[index].isCorrect = !(updatedQuestions[Index].options[index].isCorrect)
-    setIquizQuestions(updatedQuestions);
+      const updatedQuestions = [...iquizQuestions];
+    if(updatedQuestions[Index].options.some(option => option.isCorrect) && !(updatedQuestions[Index].options[index].isCorrect)){
+      return;
+    }else{
+      updatedQuestions[Index].options[index].isCorrect = !(updatedQuestions[Index].options[index].isCorrect)
+      setIquizQuestions(updatedQuestions);
+    }
     };
 
     const addEmptyQuestion = () => {
