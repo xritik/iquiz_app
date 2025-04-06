@@ -1,4 +1,6 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react';
+import '../css/leader_board.css';
+import {Link} from 'react-router-dom';
 
 const LeaderBoard = ({ hostName, navigate }) => {
     const storedRunningIQuiz = JSON.parse(sessionStorage.getItem('runningIQuiz'));
@@ -75,12 +77,28 @@ const LeaderBoard = ({ hostName, navigate }) => {
     }, [ storedPin, getStatus ]);
 
   return (
-    <div>
+    <div className='leaderBoardSection'>
+        <h1>LeaderBoard</h1>
+
         {players.map((player) => 
-            <div key={player._id}>{player.name}:- {player.scores.reduce((acc, score) => acc + score, 0)}</div>
+            <table className='leaderBoardTable'>
+                <thead>
+                    <th>Player</th>
+                    <th>Points</th>
+                    <th>Accuracy</th>
+                </thead>
+                <tbody>
+                    <tr key={player._id}>
+                        <td>{player.name}</td>
+                        <td>{player.scores.reduce((acc, score) => acc + score, 0)}</td>
+                        <td>100%</td>
+                    </tr>
+                </tbody>
+            </table>
         )}
-        {storedRunningIQuiz.questions.length>(index+1) ? 
-            <button onClick={handleNext}>Next</button> : <div></div>    
+
+        {storedRunningIQuiz && storedRunningIQuiz.questions.length>(index+1) ? 
+            <button className='nextBtn' style={{color:'black'}}>Next</button> : <Link className='nextBtn' style={{color:'black'}} to={'/home'}>Home</Link>
         }
     </div>
   )

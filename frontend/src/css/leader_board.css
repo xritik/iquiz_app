@@ -1,0 +1,53 @@
+.leaderBoardSection{
+    height: 100vh;
+    width: 100vw;
+    background: #081b29;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    gap: 55px;
+    color: white;
+}
+.leaderBoardTable{
+    border: 1px solid #0ef;
+    padding: 10px;
+    border-collapse: collapse;
+    border-radius: 20px;
+    width: 50vw;
+    th{
+        padding: 10px;
+        border: 3px solid #0ef;
+        text-align: center;
+    }
+    td{
+        border: 1px solid #0ef;
+        padding: 10px;
+        text-align: center;
+    }
+}
+.nextBtn{
+    padding: 7px 20px;
+    font-size: 17px;
+    border-radius: 7px;
+    background: #0ef;
+    cursor: pointer;
+    border: none;
+    outline: none;
+    transition: .2s;
+}
+.nextBtn:active{
+    scale: .8;
+}
+.buttons{
+    display: flex;
+    gap: 25px;
+}
+
+
+
+@media only screen and (max-width: 768px){
+    .leaderBoardTable{
+        width: 90vw;
+    }
+}
