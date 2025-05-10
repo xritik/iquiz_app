@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import '../css/leader_board.css';
-import {Link} from 'react-router-dom';
 
 const LeaderBoard = ({ hostName, navigate }) => {
     const storedRunningIQuiz = JSON.parse(sessionStorage.getItem('runningIQuiz'));
@@ -66,6 +65,14 @@ const LeaderBoard = ({ hostName, navigate }) => {
         }
     };
 
+    const handleHome = () => {
+        localStorage.removeItem('gamePin');
+        sessionStorage.removeItem('runningIQuiz');
+        sessionStorage.removeItem('storedIndex');
+        sessionStorage.removeItem('time');
+        navigate('/');
+    }
+
     useEffect(() => {
         if (!storedPin) return;
         
@@ -80,25 +87,28 @@ const LeaderBoard = ({ hostName, navigate }) => {
     <div className='leaderBoardSection'>
         <h1>LeaderBoard</h1>
 
-        {players.map((player) => 
-            <table className='leaderBoardTable'>
-                <thead>
+        <table className='leaderBoardTable'>
+            <thead>
+                <tr>
                     <th>Player</th>
                     <th>Points</th>
                     <th>Accuracy</th>
-                </thead>
-                <tbody>
+                </tr>
+            </thead>
+            <tbody>
+                {players.map((player) => 
                     <tr key={player._id}>
                         <td>{player.name}</td>
                         <td>{player.scores.reduce((acc, score) => acc + score, 0)}</td>
                         <td>100%</td>
                     </tr>
-                </tbody>
-            </table>
-        )}
+                )}
+            </tbody>
+        </table>
 
         {storedRunningIQuiz && storedRunningIQuiz.questions.length>(index+1) ? 
-            <button className='nextBtn' style={{color:'black'}}>Next</button> : <Link className='nextBtn' style={{color:'black'}} to={'/home'}>Home</Link>
+            <button onClick={handleNext} className='nextBtn' style={{color:'black'}}>Next</button> :
+            <button onClick={handleHome} className='nextBtn' style={{color:'black'}}>Home</button>
         }
     </div>
   )

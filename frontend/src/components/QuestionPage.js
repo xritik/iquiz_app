@@ -68,7 +68,7 @@ const QuestionPage = ({ hostName, navigate }) => {
             headers: {
               'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ pin: storedPin, status: 'Answering' })
+            body: JSON.stringify({ pin: storedPin, status: myStatus })
           });
           const data = await response.json();
           if(response.ok){

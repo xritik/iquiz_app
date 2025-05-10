@@ -161,6 +161,14 @@ const ShowToPlayerPage = ({ hostName, navigate }) => {
         sessionStorage.setItem('currentMarks', (500+(500*(time/timer))));
     };
 
+    const handleHome = () => {
+        localStorage.removeItem('gamePin');
+        sessionStorage.removeItem('runningIQuiz');
+        sessionStorage.removeItem('storedIndex');
+        sessionStorage.removeItem('time');
+        navigate('/');
+    };
+
   return (
     <div className='showToPlayerSection'>
       <i className='bx bxs-log-out back_arrow' onClick={handleExit}></i>
@@ -190,7 +198,7 @@ const ShowToPlayerPage = ({ hostName, navigate }) => {
                                     </div>
                                 </> :
         status === 'Loading' ? <div className='shownStatus'>Loading...</div>:
-        status === 'Answering' ?
+        ['Answering', 'Finished'].includes(status) ? 
                                 <div style={{display:`${time==0 ? 'flex' : 'none'}`}}>
                                     <div className='myoptions2' style={{display:'flex', flexDirection:'column', gap:'80px', justifyContent:'center', alignItems:'center'}}>
                                         <div>
@@ -209,9 +217,11 @@ const ShowToPlayerPage = ({ hostName, navigate }) => {
                                                 </div>
                                             ))}
                                         </div>
+                                    { status==='Finished' && <button onClick={handleHome} className='nextBtn' style={{color:'black'}}>Home</button>}
                                     </div>
-                                </div>:
-        status === 'Finished' ? <div className='shownStatus'>This IQuiz is finished!</div> : <div className='shownStatus'>Something went wrong!</div>
+                                </div> :  <div className='shownStatus'>Something went wrong!</div>
+
+        // status === 'Finished' ? <div className='shownStatus'>This IQuiz is finished!</div> : <div className='shownStatus'>Something went wrong!</div>
       }
     </div>
   )
