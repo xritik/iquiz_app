@@ -1,70 +1,154 @@
-# Getting Started with Create React App
+# 🧠 IQuiz – MERN Stack Live Quiz App
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+A full-stack real-time quiz application inspired by Kahoot!, built using the MERN stack (MongoDB, Express.js, React.js, Node.js). Users can create, edit, and delete quizzes, then host them live using a PIN that other players can use to join.
+<br>
+<br>
 
-## Available Scripts
+## 🚀 Features
 
-In the project directory, you can run:
+- ✅ User Registration & Login (with validation)
+- ✅ Create, Edit & Delete Custom Quizzes
+- ✅ Real-Time Multiplayer Quiz Hosting
+- ✅ Auto-generated Quiz PIN for Players
+- ✅ Player Join via PIN
+- ✅ Live Question Broadcasting and Answer Submission
+- ✅ MongoDB for Persistent Storage
+- ✅ Clean and Responsive UI
+<br>
+<br>
 
-### `npm start`
+## 📸 Screenshots
+<br>
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+- **Login Page**
+<img src="frontend/src/imgs/Chat_Hub_Login_Page.png" alt='img'>
+<br>
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+- **Dashboard Page**
+<img src="frontend/src/imgs/Chat_Hub_Dashboard.png" alt='img'>
+<br>
 
-### `npm test`
+- **Chatting Page**
+<img src="frontend/src/imgs/Chat_Hub_Chatting.png" alt='img'>
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+## 📂 Folder Structure
 
-### `npm run build`
+iquiz_app/                                             <br>
+│                                                      <br>
+├── frontend/       # React frontend                   <br>
+│ ├── public/                                          <br>
+│ └── src/                                             <br>
+│   ├── components/                                    <br>
+│   ├── css/                                           <br>
+│   ├── imgs/                                          <br>
+│   ├── App.js                                         <br>
+│   └── index.css                                      <br>
+│   └── index.js                                       <br>
+│ └── package.json  # Frontend metadata and scripts    <br>
+│                                                      <br>
+├── backend/        # Express backend                  <br>
+│ ├── models/       # Mongoose schemas                 <br>
+│ ├── routes/       # API endpoints                    <br>
+│ ├── db.js         # Database connection              <br>
+│ ├── package.json  # Backend metadata and scripts     <br>
+│ └── server.js     # Entry point                      <br>
+│                                                      <br>
+├── .gitignore                                         <br>
+├── package.json    # Project metadata and scripts     <br>
+└── README.md       # You're reading it!               <br>
+<br>
+<br>
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+## 🧪 Tech Stack
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+**Frontend:**
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+- React.js
+- HTML/CSS
 
-### `npm run eject`
+**Backend:**
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+- Node.js
+- Express.js
+- MongoDB with Mongoose
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+<br>
+<br>
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+## 🧱 Required Tech Stack & their Versions
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+<table width="500px">
+  <thead>
+    <th>Technology</th>
+    <th>Version</th>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Node.js</td>
+      <td>20.19.0</td>
+    </tr>
+    <tr>
+      <td>MongoDB</td>
+      <td>8.0.1</td>
+    </tr>
+  </tbody>
+</table>
 
-## Learn More
+<br>
+<br>
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+## 🔧 Getting Started
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+**1. Clone the Repository**
 
-### Code Splitting
+```bash
+git clone https://github.com/xritik/iquiz_app.git
+cd iquiz_app
+```
+<br>
+<br>
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+**2. Install Dependencies**
 
-### Analyzing the Bundle Size
+- **At Project Root:**
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+```bash
+npm install
+```
 
-### Making a Progressive Web App
+- **Frontend:**
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+```bash
+cd ../frontend
+npm install
+```
 
-### Advanced Configuration
+- **Backend:**
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+```bash
+cd backend
+npm install
+```
+<br>
+<br>
 
-### Deployment
+**3. Run the Application**
+```bash
+cd ../
+npm start
+```
+<br>
+<br>
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+## 🌐 Usage:
 
-### `npm run build` fails to minify
+- Register or login with an existing account.
+- Create a new quiz by adding questions and options.
+- Host the quiz — you'll receive a PIN.
+- Share the PIN with others so they can join.
+- Control the flow of the quiz as the host while players answer questions in real-time.
+<br>
+<br>
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+## 👨‍💻 Author
+Developed with ❤️ by [Ritik](https://github.com/xritik).
