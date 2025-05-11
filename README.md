@@ -21,15 +21,31 @@ A full-stack real-time quiz application inspired by Kahoot!, built using the MER
 <br>
 
 - **Login Page**
-<img src="frontend/src/imgs/Chat_Hub_Login_Page.png" alt='img'>
+<img src="frontend/src/imgs/Login_Page.png" alt='img'>
 <br>
 
-- **Dashboard Page**
-<img src="frontend/src/imgs/Chat_Hub_Dashboard.png" alt='img'>
+- **Home Page**
+<img src="frontend/src/imgs/Home_Page.png" alt='img'>
 <br>
 
-- **Chatting Page**
-<img src="frontend/src/imgs/Chat_Hub_Chatting.png" alt='img'>
+- **Joining Players Section**
+<img src="frontend/src/imgs/Joining_Players_Page.png" alt='img'>
+<br>
+
+- **Showing IQuiz Q. Page**
+<img src="frontend/src/imgs/Showing_IQuiz_Page.png" alt="img">
+<br>
+
+- **Showing Options to Player Page**
+<img src="frontend/src/imgs/Shown_Options_Page.png" alt="img">
+<br>
+
+- **Instant Performance to Player**
+<img src="frontend/src/imgs/Instant_IQuiz_Result_Page_To_Player.png" alt="img">
+<br>
+
+- **Leader Board Page**
+<img src="frontend/src/imgs/LeaderBoard_Page.png" alt="img">
 
 ## 📂 Folder Structure
 
