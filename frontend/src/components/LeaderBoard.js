@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import '../css/leader_board.css';
 import socket from '../socket';
 
-const LeaderBoard = ({ hostName, navigate }) => {
+const LeaderBoard = ({ HOST, navigate }) => {
   const storedRunningIQuiz = JSON.parse(sessionStorage.getItem('runningIQuiz'));
   const storedPin          = localStorage.getItem('gamePin');
 
@@ -32,7 +32,7 @@ const LeaderBoard = ({ hostName, navigate }) => {
     const fetchStatus = async () => {
       try {
         const response = await fetch(
-          `http://${hostName}:5000/runningIQuiz/status/${storedPin}`
+          `${HOST}/runningIQuiz/status/${storedPin}`
         );
         const data = await response.json();
         if (response.ok) {
@@ -82,7 +82,7 @@ const LeaderBoard = ({ hostName, navigate }) => {
     const newIndex = index + 1;
     const newTime  = storedRunningIQuiz.questions[newIndex].timer;
     try {
-      const response = await fetch(`http://${hostName}:5000/runningIQuiz/status`, {
+      const response = await fetch(`${HOST}/runningIQuiz/status`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ pin: storedPin, status: 'Started', index: newIndex, timer: newTime }),

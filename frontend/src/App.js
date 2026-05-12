@@ -8,25 +8,25 @@ import NotFoundPage from "./components/NotFoundPage.js";
 import ShowToPlayerPage from "./components/ShowToPlayerPage.js";
 import QuestionPage from "./components/QuestionPage.js";
 import LeaderBoard from "./components/LeaderBoard.js";
+const HOST = process.env.REACT_APP_API_URL;
 
 function App() {
   const navigate = useNavigate();
   const [showSignUp, setShowSignUp] = useState(false);
-  const hostName = `${window.location.hostname}`;
-  // const hostName = '192.168.221.96'; 
+  // const HOST = `${window.location.protocol}//${window.location.hostname}:5000`;
 
   return (
     <div className="App">
       <Routes>
-        <Route path={'/'} element={<Home hostName={hostName} navigate={navigate} setShowSignUp={setShowSignUp} />} />
-        <Route path={'/home'} element={<Home hostName={hostName} navigate={navigate} setShowSignUp={setShowSignUp} />} />
-        <Route path={'/login_signUp'} element={<Login_Signup hostName={hostName} navigate={navigate} showSignUp={showSignUp} setShowSignUp={setShowSignUp} />} />
-        <Route path={'/adding_iquiz'} element={<IQuizCreationPage hostName={hostName} navigate={navigate} />} />
-        <Route path={'/editing_iquiz'} element={<IQuizEditionPage hostName={hostName} navigate={navigate} />} />
-        <Route path={'/in-game'} element={<ShowToPlayerPage hostName={hostName} navigate={navigate} />} />
-        <Route path={'/question'} element={<QuestionPage hostName={hostName} navigate={navigate} />} />
-        <Route path={'/leaderBoard'} element={<LeaderBoard hostName={hostName} navigate={navigate} />} />
-        <Route path={'*'} element={<NotFoundPage hostName={hostName} navigate={navigate} />}/>
+        <Route path={'/'} element={<Home HOST={HOST} navigate={navigate} setShowSignUp={setShowSignUp} />} />
+        <Route path={'/home'} element={<Home HOST={HOST} navigate={navigate} setShowSignUp={setShowSignUp} />} />
+        <Route path={'/login_signUp'} element={<Login_Signup HOST={HOST} navigate={navigate} showSignUp={showSignUp} setShowSignUp={setShowSignUp} />} />
+        <Route path={'/adding_iquiz'} element={<IQuizCreationPage HOST={HOST} navigate={navigate} />} />
+        <Route path={'/editing_iquiz'} element={<IQuizEditionPage HOST={HOST} navigate={navigate} />} />
+        <Route path={'/in-game'} element={<ShowToPlayerPage HOST={HOST} navigate={navigate} />} />
+        <Route path={'/question'} element={<QuestionPage HOST={HOST} navigate={navigate} />} />
+        <Route path={'/leaderBoard'} element={<LeaderBoard HOST={HOST} navigate={navigate} />} />
+        <Route path={'*'} element={<NotFoundPage HOST={HOST} navigate={navigate} />}/>
       </Routes>
     </div>
   );

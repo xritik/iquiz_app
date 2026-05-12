@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import '../css/iquiz_creation_page.css'
 
-const QuizCreation = ({ hostName, navigate }) => {
+const QuizCreation = ({ HOST, navigate }) => {
   const [iquizTitle, setIquizTitle] = useState('');
   const [iquizQuestions, setIquizQuestions] = useState([
     {
@@ -99,7 +99,7 @@ const QuizCreation = ({ hostName, navigate }) => {
         const quizData = { user: loggedinUser, title: iquizTitle, questions: iquizQuestions };
 
         try{
-            const response = await fetch(`http://${hostName}:5000/iquiz`, {
+            const response = await fetch(`${HOST}/iquiz`, {
                 method: 'POST',
                 headers:{
                 'Content-Type': 'application/json'

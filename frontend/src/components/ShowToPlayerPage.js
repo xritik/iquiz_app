@@ -2,7 +2,7 @@ import React, { useEffect, useState, useRef, useCallback } from 'react';
 import '../css/showToPlayer_page.css';
 import socket from '../socket';
 
-const ShowToPlayerPage = ({ hostName, navigate }) => {
+const ShowToPlayerPage = ({ HOST, navigate }) => {
   const storedPin  = sessionStorage.getItem('playerPin');
   const storedName = sessionStorage.getItem('playerName');
 
@@ -59,7 +59,7 @@ const ShowToPlayerPage = ({ hostName, navigate }) => {
   const submitMarks = useCallback(async (correctOpts, selOption, earnedMarks, qIndex) => {
     const myMarks = correctOpts.includes(Number(selOption)) ? earnedMarks : 0;
     try {
-      const response = await fetch(`http://${hostName}:5000/runningIQuiz/setMarks`, {
+      const response = await fetch(`${HOST}/runningIQuiz/setMarks`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ storedPin, storedName, myMarks, index: qIndex }),
@@ -72,13 +72,13 @@ const ShowToPlayerPage = ({ hostName, navigate }) => {
     } catch (error) {
       console.error(error);
     }
-  }, [hostName, storedPin, storedName]);
+  }, [HOST, storedPin, storedName]);
 
   // ─── Fetch correct options for a question ────────────────────────────────
   const getCorrectOptions = useCallback(async (iquizId, qIndex) => {
     try {
       const response = await fetch(
-        `http://${hostName}:5000/iquiz/correctOptions/${iquizId}/${qIndex}`
+        `${HOST}/iquiz/correctOptions/${iquizId}/${qIndex}`
       );
       const data = await response.json();
       if (response.ok) {
@@ -89,7 +89,7 @@ const ShowToPlayerPage = ({ hostName, navigate }) => {
       console.error(error);
     }
     return [];
-  }, [hostName]);
+  }, [HOST]);
 
   // ─── WebSocket: game status updates ──────────────────────────────────────
   useEffect(() => {
@@ -146,7 +146,7 @@ const ShowToPlayerPage = ({ hostName, navigate }) => {
     const fetchInitialStatus = async () => {
       try {
         const response = await fetch(
-          `http://${hostName}:5000/runningIQuiz/status/${storedPin}`
+          `${HOST}/runningIQuiz/status/${storedPin}`
         );
         const data = await response.json();
         if (response.ok) {

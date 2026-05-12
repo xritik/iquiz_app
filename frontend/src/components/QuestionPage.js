@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useCallback, useRef } from 'react';
 import socket from '../socket';
 
-const QuestionPage = ({ hostName, navigate }) => {
+const QuestionPage = ({ HOST, navigate }) => {
   const storedRunningIQuiz = JSON.parse(sessionStorage.getItem('runningIQuiz'));
   const storedPin          = localStorage.getItem('gamePin');
 
@@ -46,7 +46,7 @@ const QuestionPage = ({ hostName, navigate }) => {
     const myStatus =
       storedRunningIQuiz.questions.length > currentIndex + 1 ? 'Answering' : 'Finished';
     try {
-      const response = await fetch(`http://${hostName}:5000/runningIQuiz/statusAnswering`, {
+      const response = await fetch(`${HOST}/runningIQuiz/statusAnswering`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ pin: storedPin, status: myStatus }),
@@ -63,7 +63,7 @@ const QuestionPage = ({ hostName, navigate }) => {
       alert('Something went wrong, please try again!');
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [hostName, navigate, storedPin]);
+  }, [navigate, storedPin]);
 
   // ─── Auto-reveal correct answers after question timer ────────────────────
   useEffect(() => {
