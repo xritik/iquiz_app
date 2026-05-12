@@ -1,7 +1,7 @@
 import { Route, Routes, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import  Home  from './components/Home.js';
-import Login_Signup  from './components/Login_Signup.js';
+import LoginSignup  from './components/Login_Signup.js';
 import IQuizCreationPage from "./components/IQuizCreationPage.js";
 import IQuizEditionPage from "./components/IQuizEditionPage.js";
 import NotFoundPage from "./components/NotFoundPage.js";
@@ -20,7 +20,7 @@ function App() {
       <Routes>
         <Route path={'/'} element={<Home HOST={HOST} navigate={navigate} setShowSignUp={setShowSignUp} />} />
         <Route path={'/home'} element={<Home HOST={HOST} navigate={navigate} setShowSignUp={setShowSignUp} />} />
-        <Route path={'/login_signUp'} element={<Login_Signup HOST={HOST} navigate={navigate} showSignUp={showSignUp} setShowSignUp={setShowSignUp} />} />
+        <Route path={'/login_signUp'} element={<LoginSignup HOST={HOST} navigate={navigate} showSignUp={showSignUp} setShowSignUp={setShowSignUp} />} />
         <Route path={'/adding_iquiz'} element={<IQuizCreationPage HOST={HOST} navigate={navigate} />} />
         <Route path={'/editing_iquiz'} element={<IQuizEditionPage HOST={HOST} navigate={navigate} />} />
         <Route path={'/in-game'} element={<ShowToPlayerPage HOST={HOST} navigate={navigate} />} />
