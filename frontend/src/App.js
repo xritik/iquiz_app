@@ -13,7 +13,7 @@ import LeaderBoard from "./components/LeaderBoard.js";
 // Set REACT_APP_BACKEND_URL in Vercel environment variables
 // to your Render backend URL e.g. https://your-app.onrender.com
 export const BACKEND_URL =
-  process.env.REACT_APP_BACKEND_URL || `http://${window.location.hostname}:5000`;
+  process.env.REACT_APP_API_URL || `http://${window.location.hostname}:5000`;
 
 function App() {
   const navigate = useNavigate();
