@@ -1,139 +1,156 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useCallback, useRef } from 'react';
+import socket from '../socket';
 
 const QuestionPage = ({ hostName, navigate }) => {
-    const storedRunningIQuiz = JSON.parse(sessionStorage.getItem('runningIQuiz'));
-    const [index, setIndex] = useState( sessionStorage.getItem('storedIndex') || 0 );
-    const [activeClass, setActiveClass] = useState('');
-    const [timer, setTimer] = useState( sessionStorage.getItem('time') || storedRunningIQuiz.questions[index].timer );
-    const [status, setStatus] = useState('Started');
+  const storedRunningIQuiz = JSON.parse(sessionStorage.getItem('runningIQuiz'));
+  const storedPin          = localStorage.getItem('gamePin');
 
-    const storedPin = localStorage.getItem('gamePin');
+  const initialIndex = Number(sessionStorage.getItem('storedIndex')) || 0;
+  const initialTime  = Number(sessionStorage.getItem('time')) ||
+                       storedRunningIQuiz?.questions[initialIndex]?.timer || 30;
 
-    useState(() => {
-        if(storedRunningIQuiz===null){
-            sessionStorage.removeItem('runningIQuiz');
-            sessionStorage.removeItem('storedIndex');
-            sessionStorage.removeItem('time');
-            localStorage.removeItem('gamePin');
-            navigate('/');
+  const [index, setIndex]           = useState(initialIndex);
+  const [activeClass, setActiveClass] = useState('');
+  const [timer, setTimer]           = useState(initialTime);
+
+  // Ref so the auto-advance callback always sees the latest index
+  const indexRef = useRef(index);
+  useEffect(() => { indexRef.current = index; }, [index]);
+
+  // ─── Guard ────────────────────────────────────────────────────────────────
+  useEffect(() => {
+    if (!storedRunningIQuiz || !storedPin) {
+      sessionStorage.removeItem('runningIQuiz');
+      sessionStorage.removeItem('storedIndex');
+      sessionStorage.removeItem('time');
+      localStorage.removeItem('gamePin');
+      navigate('/');
+      return;
+    }
+    if (!sessionStorage.getItem('storedIndex')) {
+      sessionStorage.setItem('storedIndex', 0);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // ─── Join socket room as host ─────────────────────────────────────────────
+  useEffect(() => {
+    if (storedPin) socket.emit('host:join', storedPin);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // ─── Move to Answering/Finished ───────────────────────────────────────────
+  const changeStatus = useCallback(async () => {
+    if (!storedRunningIQuiz) return;
+    const currentIndex = indexRef.current;
+    const myStatus =
+      storedRunningIQuiz.questions.length > currentIndex + 1 ? 'Answering' : 'Finished';
+    try {
+      const response = await fetch(`http://${hostName}:5000/runningIQuiz/statusAnswering`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ pin: storedPin, status: myStatus }),
+      });
+      const data = await response.json();
+      if (response.ok) {
+        navigate('/leaderBoard');
+      } else {
+        alert(data.message || 'Something went wrong!');
+        navigate('/');
+      }
+    } catch (error) {
+      console.error(error);
+      alert('Something went wrong, please try again!');
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [hostName, navigate, storedPin]);
+
+  // ─── Auto-reveal correct answers after question timer ────────────────────
+  useEffect(() => {
+    if (!storedRunningIQuiz) return;
+    const questionTimer = storedRunningIQuiz.questions[index]?.timer || 30;
+    const t = setTimeout(
+      () => setActiveClass('myoption2Active'),
+      questionTimer * 1000 + 2000
+    );
+    return () => clearTimeout(t);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [index]);
+
+  // ─── Local countdown ──────────────────────────────────────────────────────
+  useEffect(() => {
+    if (timer === 0) {
+      const t = setTimeout(() => changeStatus(), 5000);
+      return () => clearTimeout(t);
+    }
+
+    sessionStorage.setItem('time', timer);
+
+    const interval = setInterval(() => {
+      setTimer((prev) => {
+        if (prev <= 1) {
+          clearInterval(interval);
+          return 0;
         }
-        if(!(sessionStorage.getItem('storedIndex'))){
-            sessionStorage.setItem('storedIndex', 0);
-        };
-    }, [navigate]);
+        return prev - 1;
+      });
+    }, 1000);
 
-    const getStatus = async () => {
-        const response = await fetch(`http://${hostName}:5000/runningIQuiz/status/${storedPin}`);
-        const data = await response.json();
-        if(data.status==='Answering'){
-            sessionStorage.setItem('time', 0);
-            setTimer(0);
-        }
-        
-        if(response.ok){
-            setStatus(data.status);
-            setIndex(data.index);
-        }else if(response.status===400){
-            sessionStorage.removeItem('runningIQuiz');
-            sessionStorage.removeItem('storedIndex');
-            sessionStorage.removeItem('time');
-            localStorage.removeItem('gamePin');
-            navigate('/');
-        };
+    return () => clearInterval(interval);
+  }, [timer, changeStatus]);
+
+  // ─── WebSocket: if server forces Answering (e.g. all players answered) ───
+  useEffect(() => {
+    const handleStatusUpdate = (data) => {
+      if (data.status === 'Answering') {
+        setTimer(0);
+        sessionStorage.setItem('time', 0);
+      }
+      // Sync index if host somehow gets out of sync
+      if (data.index !== undefined) {
+        setIndex(data.index);
+      }
     };
 
-    useEffect(() => {
-        if (!storedPin) return;
-        
-        const intervalId = setInterval(() => {
-            getStatus();
-        }, 500);
-        
-        return () => clearInterval(intervalId);
-    }, [storedPin]);
+    socket.on('game:statusUpdate', handleStatusUpdate);
+    return () => socket.off('game:statusUpdate', handleStatusUpdate);
+  }, []);
 
-    useEffect(() => {
-        const timer = setTimeout(() => {
-            setActiveClass('myoption2Active');
-            console.log('first')
-        }, (storedRunningIQuiz.questions[index].timer)*1000 + 2000 );
-        return () => clearTimeout(timer);
-    }, [ navigate ]);
+  if (!storedRunningIQuiz) return null;
 
-    const changeStatus = async () => {
-        const myStatus = storedRunningIQuiz.questions.length>(index+1) ? 'Answering' : 'Finished'
-        try {
-          const response = await fetch(`http://${hostName}:5000/runningIQuiz/statusAnswering`,{
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ pin: storedPin, status: myStatus })
-          });
-          const data = await response.json();
-          if(response.ok){
-            navigate('/leaderBoard');
-          }else if(response.status===404){
-            navigate('/');
-            alert(data.message);
-          }else if(response.status===500){
-            navigate('/');
-            alert(data.message);
-          }else{
-            alert('Something went wrong, Please try again1!');
-          }
-        } catch (error) {
-          console.error(error);
-          alert('Something went wrong, Please try again!');
-        }
-    };
-
-    useEffect(() => {
-        if (timer === 0){
-            const timer = setTimeout(() => {
-                changeStatus();
-            }, 5000 );
-            return () => clearTimeout(timer);
-        };
-
-        if(timer!=0){
-            sessionStorage.setItem('time', timer);
-        }
-
-        const interval = setInterval(() => {
-            setTimer((prevTimer) => prevTimer - 1);
-        }, 1000);
-
-        return () => clearInterval(interval);
-    }, [timer])
-
-    
+  const currentQuestion = storedRunningIQuiz.questions[index];
 
   return (
-    <div className='showToPlayerSection'>
-
-      <div className='myshowQuestion'>
-        <div className='myquestionNo'>1.</div>
-        <div className='myquestion'>{storedRunningIQuiz.questions[index].question}</div>
+    <div className="showToPlayerSection">
+      <div className="myshowQuestion">
+        <div className="myquestionNo">{index + 1}.</div>
+        <div className="myquestion">{currentQuestion.question}</div>
       </div>
 
-      <div className='mytimer'>
+      <div className="mytimer">
         <span>{timer}</span>
       </div>
 
-      <div className='myoptions2'>
-        <div className='myoption2'>
-          <div className={ storedRunningIQuiz.questions[index].options[0].isCorrect ? activeClass : '' }>{storedRunningIQuiz.questions[index].options[0].text}</div>
-          <div className={ storedRunningIQuiz.questions[index].options[1].isCorrect ? activeClass : '' }>{storedRunningIQuiz.questions[index].options[1].text}</div>
+      <div className="myoptions2">
+        <div className="myoption2">
+          <div className={currentQuestion.options[0].isCorrect ? activeClass : ''}>
+            {currentQuestion.options[0].text}
+          </div>
+          <div className={currentQuestion.options[1].isCorrect ? activeClass : ''}>
+            {currentQuestion.options[1].text}
+          </div>
         </div>
-        <div className='myoption2'>
-          <div className={ storedRunningIQuiz.questions[index].options[2].isCorrect ? activeClass : '' }>{storedRunningIQuiz.questions[index].options[2].text}</div>
-          <div className={ storedRunningIQuiz.questions[index].options[3].isCorrect ? activeClass : '' }>{storedRunningIQuiz.questions[index].options[3].text}</div>
+        <div className="myoption2">
+          <div className={currentQuestion.options[2].isCorrect ? activeClass : ''}>
+            {currentQuestion.options[2].text}
+          </div>
+          <div className={currentQuestion.options[3].isCorrect ? activeClass : ''}>
+            {currentQuestion.options[3].text}
+          </div>
         </div>
       </div>
-
     </div>
-  )
-}
+  );
+};
 
 export default QuestionPage;

@@ -1,117 +1,153 @@
 import React, { useEffect, useState } from 'react';
 import '../css/leader_board.css';
+import socket from '../socket';
 
 const LeaderBoard = ({ hostName, navigate }) => {
-    const storedRunningIQuiz = JSON.parse(sessionStorage.getItem('runningIQuiz'));
-    const storedIndex = sessionStorage.getItem('storedIndex');
-    const storedPin = localStorage.getItem('gamePin');
-    const [status, setStatus] = useState();
-    const [index, setIndex] = useState();
-    const [players, setPlayers] = useState([]);
+  const storedRunningIQuiz = JSON.parse(sessionStorage.getItem('runningIQuiz'));
+  const storedPin          = localStorage.getItem('gamePin');
 
-    useEffect(() => {
-        if(!storedPin){
-            sessionStorage.removeItem('runningIQuiz');
-            sessionStorage.removeItem('storedIndex');
-            sessionStorage.removeItem('time');
-            localStorage.removeItem('gamePin');
-            navigate('/');
-        }
-    }, [ navigate, storedPin ]);
+  const [index, setIndex]     = useState(Number(sessionStorage.getItem('storedIndex')) || 0);
+  const [players, setPlayers] = useState([]);
 
-    const getStatus = async () => {
-        const response = await fetch(`http://${hostName}:5000/runningIQuiz/status/${storedPin}`);
-        const data = await response.json();
-        
-        if(response.ok){
-            setStatus(data.status);
-            setIndex(data.index);
-            setPlayers(data.players);
-        }else if(response.status===400){
-            sessionStorage.removeItem('runningIQuiz');
-            sessionStorage.removeItem('storedIndex');
-            sessionStorage.removeItem('time');
-            localStorage.removeItem('gamePin');
-            navigate('/');
-        };
-    };
-
-    const handleNext = async () => {
-        const newIndex = index+1;
-        const newTime = storedRunningIQuiz.questions[newIndex].timer;
-        try {
-            const response = await fetch(`http://${hostName}:5000/runningIQuiz/status`,{
-                method: 'POST',
-                headers: {
-                'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ pin: storedPin, status: 'Started', index: newIndex, timer: newTime })
-            });
-            const data = await response.json();
-            if(response.ok){
-                sessionStorage.setItem('storedIndex', newIndex);
-                sessionStorage.setItem('time', newTime)
-                navigate('/question');
-            }else if(response.status===404){
-                alert(data.message);
-            }else if(response.status===500){
-                alert(data.message);
-            }else{
-                alert('Something went wrong, Please try again1!');
-            }
-        } catch (error) {
-            console.error(error);
-            alert('Something went wrong, Please try again!');
-        }
-    };
-
-    const handleHome = () => {
-        localStorage.removeItem('gamePin');
-        sessionStorage.removeItem('runningIQuiz');
-        sessionStorage.removeItem('storedIndex');
-        sessionStorage.removeItem('time');
-        navigate('/');
+  // ─── Guard ────────────────────────────────────────────────────────────────
+  useEffect(() => {
+    if (!storedPin) {
+      sessionStorage.removeItem('runningIQuiz');
+      sessionStorage.removeItem('storedIndex');
+      sessionStorage.removeItem('time');
+      navigate('/');
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
-    useEffect(() => {
-        if (!storedPin) return;
-        
-        const intervalId = setInterval(() => {
-            getStatus();
-        }, 500);
-        
-        return () => clearInterval(intervalId);
-    }, [ storedPin, getStatus ]);
+  // ─── Join socket room as host ─────────────────────────────────────────────
+  useEffect(() => {
+    if (storedPin) socket.emit('host:join', storedPin);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // ─── Initial data fetch ───────────────────────────────────────────────────
+  useEffect(() => {
+    if (!storedPin) return;
+    const fetchStatus = async () => {
+      try {
+        const response = await fetch(
+          `http://${hostName}:5000/runningIQuiz/status/${storedPin}`
+        );
+        const data = await response.json();
+        if (response.ok) {
+          setIndex(data.index ?? 0);
+          setPlayers(data.players || []);
+          // If the quiz is fully finished, release the pin immediately
+          // so the host can start a new game without clicking Home first
+          if (data.status === 'Finished') {
+            localStorage.removeItem('gamePin');
+          }
+        } else if (response.status === 400) {
+          navigate('/');
+        }
+      } catch (error) {
+        console.error(error);
+      }
+    };
+    fetchStatus();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // ─── WebSocket: live leaderboard & game-ended ────────────────────────────
+  useEffect(() => {
+    const handleLeaderboardUpdate = (updatedPlayers) => {
+      setPlayers([...updatedPlayers]);
+    };
+
+    const handleGameEnded = () => {
+      sessionStorage.removeItem('runningIQuiz');
+      sessionStorage.removeItem('storedIndex');
+      sessionStorage.removeItem('time');
+      localStorage.removeItem('gamePin');
+      navigate('/');
+    };
+
+    socket.on('leaderboard:update', handleLeaderboardUpdate);
+    socket.on('game:ended', handleGameEnded);
+
+    return () => {
+      socket.off('leaderboard:update', handleLeaderboardUpdate);
+      socket.off('game:ended', handleGameEnded);
+    };
+  }, [navigate]);
+
+  // ─── Next question ────────────────────────────────────────────────────────
+  const handleNext = async () => {
+    const newIndex = index + 1;
+    const newTime  = storedRunningIQuiz.questions[newIndex].timer;
+    try {
+      const response = await fetch(`http://${hostName}:5000/runningIQuiz/status`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ pin: storedPin, status: 'Started', index: newIndex, timer: newTime }),
+      });
+      const data = await response.json();
+      if (response.ok) {
+        sessionStorage.setItem('storedIndex', newIndex);
+        sessionStorage.setItem('time', newTime);
+        navigate('/question');
+      } else {
+        alert(data.message || 'Something went wrong!');
+      }
+    } catch (error) {
+      console.error(error);
+      alert('Something went wrong, please try again!');
+    }
+  };
+
+  const handleHome = () => {
+    localStorage.removeItem('gamePin');
+    sessionStorage.removeItem('runningIQuiz');
+    sessionStorage.removeItem('storedIndex');
+    sessionStorage.removeItem('time');
+    navigate('/');
+  };
+
+  // ─── Sort by total score descending ──────────────────────────────────────
+  const sortedPlayers = [...players].sort((a, b) => {
+    const sumA = a.scores.reduce((acc, s) => acc + s, 0);
+    const sumB = b.scores.reduce((acc, s) => acc + s, 0);
+    return sumB - sumA;
+  });
+
+  const totalQuestions = storedRunningIQuiz?.questions?.length || 0;
 
   return (
-    <div className='leaderBoardSection'>
-        <h1>LeaderBoard</h1>
+    <div className="leaderBoardSection">
+      <h1>LeaderBoard</h1>
 
-        <table className='leaderBoardTable'>
-            <thead>
-                <tr>
-                    <th>Player</th>
-                    <th>Points</th>
-                    <th>Accuracy</th>
-                </tr>
-            </thead>
-            <tbody>
-                {players.map((player) => 
-                    <tr key={player._id}>
-                        <td>{player.name}</td>
-                        <td>{player.scores.reduce((acc, score) => acc + score, 0)}</td>
-                        <td>100%</td>
-                    </tr>
-                )}
-            </tbody>
-        </table>
+      <table className="leaderBoardTable">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Player</th>
+            <th>Points</th>
+          </tr>
+        </thead>
+        <tbody>
+          {sortedPlayers.map((player, i) => (
+            <tr key={player._id || player.name}>
+              <td>{i + 1}</td>
+              <td>{player.name}</td>
+              <td>{player.scores.reduce((acc, s) => acc + s, 0)}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
 
-        {storedRunningIQuiz && storedRunningIQuiz.questions.length>(index+1) ? 
-            <button onClick={handleNext} className='nextBtn' style={{color:'black'}}>Next</button> :
-            <button onClick={handleHome} className='nextBtn' style={{color:'black'}}>Home</button>
-        }
+      {totalQuestions > index + 1 ? (
+        <button onClick={handleNext} className="nextBtn" style={{ color: 'black' }}>Next</button>
+      ) : (
+        <button onClick={handleHome} className="nextBtn" style={{ color: 'black' }}>Home</button>
+      )}
     </div>
-  )
-}
+  );
+};
 
-export default LeaderBoard
+export default LeaderBoard;

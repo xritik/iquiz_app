@@ -1,230 +1,315 @@
-import React, { useEffect, useState } from 'react';
-import  '../css/showToPlayer_page.css';
+import React, { useEffect, useState, useRef, useCallback } from 'react';
+import '../css/showToPlayer_page.css';
+import socket from '../socket';
 
 const ShowToPlayerPage = ({ hostName, navigate }) => {
-    const storedPin = sessionStorage.getItem('playerPin');
-    const storedName = sessionStorage.getItem('playerName');
-    const [status, setStatus] = useState('Loading');
-    const savedMarks = sessionStorage.getItem('currentMarks');
-    const [index, setIndex] = useState(null);
-    const [timer, setTimer] = useState(null);
-    const [time, setTime] = useState( null );
-    const [startedIQuizId, setStartedIQuizId] = useState('');
-    const [selectedOption, setSelectedOption] = useState( (sessionStorage.getItem('selectedOption')) || null);
-    const [correctOptions, setCorrectOptions] = useState([]);
-    const [marks, setMarks] = useState( savedMarks || '');
-    const [myScores, setMyScores] = useState( JSON.parse(sessionStorage.getItem('myScores')) || [] ); 
+  const storedPin  = sessionStorage.getItem('playerPin');
+  const storedName = sessionStorage.getItem('playerName');
 
-    useEffect(() => {
-        if(!storedName && !storedPin){
-            navigate('/')
-        };
-    },[ storedPin, storedName, status, navigate ]);
+  const [status, setStatus]                 = useState('Loading');
+  const [timer, setTimer]                   = useState(null);
+  const [time, setTime]                     = useState(null);
+  const [selectedOption, setSelectedOption] = useState(
+    sessionStorage.getItem('selectedOption') !== '' &&
+    sessionStorage.getItem('selectedOption') != null
+      ? Number(sessionStorage.getItem('selectedOption'))
+      : null
+  );
+  const [correctOptions, setCorrectOptions] = useState([]);
+  const [marks, setMarks]                   = useState(
+    Number(sessionStorage.getItem('currentMarks')) || 0
+  );
+  const [myScores, setMyScores]             = useState(
+    JSON.parse(sessionStorage.getItem('myScores')) || []
+  );
 
-    const handleExit = () => {
-        const confirmation = window.confirm('Are you sure to exit the game!');
-        if(confirmation){
-            sessionStorage.removeItem('playerPin');
-            sessionStorage.removeItem('playerName');
-            sessionStorage.removeItem('selectedOption');
-            sessionStorage.removeItem('time');
-            sessionStorage.removeItem('currentMarks');
-            sessionStorage.removeItem('storedIndex');
-            navigate('/');
+  // Refs so socket callbacks always see latest values without stale closures
+  const selectedOptionRef = useRef(selectedOption);
+  const marksRef          = useRef(Number(sessionStorage.getItem('currentMarks')) || 0);
+  const timerRef          = useRef(timer);
+
+  useEffect(() => { selectedOptionRef.current = selectedOption; }, [selectedOption]);
+  useEffect(() => { marksRef.current = marks; }, [marks]);
+  useEffect(() => { timerRef.current = timer; }, [timer]);
+
+  // ─── Clear session storage and navigate home ──────────────────────────────
+  const clearSession = useCallback(() => {
+    sessionStorage.removeItem('playerPin');
+    sessionStorage.removeItem('playerName');
+    sessionStorage.removeItem('selectedOption');
+    sessionStorage.removeItem('time');
+    sessionStorage.removeItem('currentMarks');
+    sessionStorage.removeItem('storedIndex');
+    sessionStorage.removeItem('myScores');
+  }, []);
+
+  // ─── Guard: redirect if no session ────────────────────────────────────────
+  useEffect(() => {
+    if (!storedName || !storedPin) navigate('/');
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // ─── Join socket room once on mount ───────────────────────────────────────
+  useEffect(() => {
+    if (storedPin) socket.emit('player:join', storedPin);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // ─── Submit marks to server ───────────────────────────────────────────────
+  const submitMarks = useCallback(async (correctOpts, selOption, earnedMarks, qIndex) => {
+    const myMarks = correctOpts.includes(Number(selOption)) ? earnedMarks : 0;
+    try {
+      const response = await fetch(`http://${hostName}:5000/runningIQuiz/setMarks`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ storedPin, storedName, myMarks, index: qIndex }),
+      });
+      const data = await response.json();
+      if (response.ok) {
+        setMyScores(data.scores);
+        sessionStorage.setItem('myScores', JSON.stringify(data.scores));
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  }, [hostName, storedPin, storedName]);
+
+  // ─── Fetch correct options for a question ────────────────────────────────
+  const getCorrectOptions = useCallback(async (iquizId, qIndex) => {
+    try {
+      const response = await fetch(
+        `http://${hostName}:5000/iquiz/correctOptions/${iquizId}/${qIndex}`
+      );
+      const data = await response.json();
+      if (response.ok) {
+        setCorrectOptions(data.correctOptions);
+        return data.correctOptions;
+      }
+    } catch (error) {
+      console.error(error);
+    }
+    return [];
+  }, [hostName]);
+
+  // ─── WebSocket: game status updates ──────────────────────────────────────
+  useEffect(() => {
+    const handleStatusUpdate = async (data) => {
+      const { status: newStatus, index: newIndex, timer: newTimer, id } = data;
+
+      setStatus(newStatus);
+
+      if (newStatus === 'Started') {
+        const prevIndex = sessionStorage.getItem('storedIndex');
+        if (String(newIndex) !== String(prevIndex)) {
+          // New question — reset state
+          setSelectedOption(null);
+          selectedOptionRef.current = null;
+          setMarks(0);
+          marksRef.current = 0;
+          setCorrectOptions([]);
+          sessionStorage.removeItem('selectedOption');
+          sessionStorage.removeItem('currentMarks');
+          sessionStorage.setItem('storedIndex', newIndex);
         }
+        const t = Number(newTimer);
+        setTimer(t);
+        timerRef.current = t;
+        setTime(t);
+        sessionStorage.setItem('time', t);
+      }
+
+      if (newStatus === 'Answering' || newStatus === 'Finished') {
+        setTime(0);
+        sessionStorage.setItem('time', 0);
+        const opts = await getCorrectOptions(id, newIndex);
+        await submitMarks(opts, selectedOptionRef.current, marksRef.current, newIndex);
+      }
     };
 
-    const getStatus = async () => {
-        const response = await fetch(`http://${hostName}:5000/runningIQuiz/status/${storedPin}`);
+    const handleGameEnded = () => {
+      clearSession();
+      navigate('/');
+    };
+
+    socket.on('game:statusUpdate', handleStatusUpdate);
+    socket.on('game:ended', handleGameEnded);
+
+    return () => {
+      socket.off('game:statusUpdate', handleStatusUpdate);
+      socket.off('game:ended', handleGameEnded);
+    };
+  }, [navigate, getCorrectOptions, submitMarks, clearSession]);
+
+  // ─── Initial status fetch (handles page refresh / reconnect) ─────────────
+  useEffect(() => {
+    if (!storedPin) return;
+    const fetchInitialStatus = async () => {
+      try {
+        const response = await fetch(
+          `http://${hostName}:5000/runningIQuiz/status/${storedPin}`
+        );
         const data = await response.json();
-        if(data.status==='Answering'){
-            sessionStorage.setItem('time', 0);
+        if (response.ok) {
+          setStatus(data.status);
+          const t = Number(data.timer);
+          setTimer(t);
+          timerRef.current = t;
+
+          if (data.status === 'Started') {
+            const savedTime = Number(sessionStorage.getItem('time'));
+            setTime(savedTime > 0 ? savedTime : t);
+          } else if (['Answering', 'Finished'].includes(data.status)) {
+            setTime(0);
+            // Restore correct options so highlights show correctly after a refresh
+            getCorrectOptions(data.id, data.index);
+          }
+        } else if (response.status === 400) {
+          clearSession();
+          navigate('/');
         }
-        if(data.timer==(sessionStorage.getItem('time'))){
-            sessionStorage.removeItem('selectedOption');
-            sessionStorage.removeItem('currentMarks');
-            setSelectedOption(null);
-        }
-        
-        if(response.ok){
-            setStatus(data.status);
-            setTimer(data.timer);
-            setIndex(data.index);
-            setStartedIQuizId(data.id);
-        }else if(response.status===400){
-            sessionStorage.removeItem('playerPin');
-            sessionStorage.removeItem('playerName');
-            sessionStorage.removeItem('selectedOption');
-            sessionStorage.removeItem('time');
-            sessionStorage.removeItem('currentMarks');
-            sessionStorage.removeItem('storedIndex');
-            navigate('/');
-        };
-        // console.log(question);
+      } catch (error) {
+        console.error(error);
+      }
     };
+    fetchInitialStatus();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
-    useEffect(() => {
-        if(time==0){
-            if(correctOptions.includes(Number(selectedOption))){
-                setMarks(savedMarks);
-            }else{
-                setMarks(0);
-            }
-        };
-    }, [ time, correctOptions ]);
+  // ─── Local countdown ──────────────────────────────────────────────────────
+  useEffect(() => {
+    if (time === null || time <= 0) return;
 
-    const handlemarks = async (myCorrectOptions) => {
-        const myMarks = myCorrectOptions.includes(Number(selectedOption)) ? savedMarks : 0;
-        try{
-            const response = await fetch(`http://${hostName}:5000/runningIQuiz/setMarks`,{
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ storedPin, storedName, myMarks, index })
-            });
-            const data = await response.json();
-            if(response.ok){
-                setMyScores(data.scores);
-                // sessionStorage.setItem('myScores', JSON.stringify(data.scores));
-            };
-        }catch(error){
-            console.error(error);
+    sessionStorage.setItem('time', time);
+
+    const interval = setInterval(() => {
+      setTime((prev) => {
+        if (prev <= 1) {
+          clearInterval(interval);
+          return 0;
         }
-    };
+        return prev - 1;
+      });
+    }, 1000);
 
-    const getCorrectOptions = async () => {
-        try{
-            const response = await fetch(`http://${hostName}:5000/iquiz/correctOptions/${startedIQuizId}/${index}`);
-            const data = await response.json();
-            // console.log(data.correctOptions);
-            if(response.ok){
-                setCorrectOptions(data.correctOptions);
-                handlemarks(data.correctOptions);
-            }else if(response.status===404){
-                alert(data.message);
-            }else if(response.status===500){
-                alert(data.message);
-            }else{
-                alert('Something went wrong');
-            }
-        }catch (error) {
-            console.error(error);
-            alert('Something went wrong');
-        };
-    };
+    return () => clearInterval(interval);
+  }, [time]);
 
-    useEffect(() => {
-        if(status==='Started'){
-            setTime(timer);
-        }else{
-            setTime(Number(sessionStorage.getItem('time')));
-            setMarks(Number(sessionStorage.getItem('currentMarks')));
-        }
+  // ─── Option selection ─────────────────────────────────────────────────────
+  const handleSelectOption = (optionIndex) => {
+    if (time === 0 || status !== 'Started') return;
+    const newSelection = selectedOption === optionIndex ? null : optionIndex;
+    setSelectedOption(newSelection);
+    selectedOptionRef.current = newSelection;
+    sessionStorage.setItem('selectedOption', newSelection === null ? '' : String(newSelection));
+    const earned = Math.round(500 + 500 * (time / timerRef.current));
+    setMarks(earned);
+    marksRef.current = earned;
+    sessionStorage.setItem('currentMarks', earned);
+  };
 
-        if((time==0) && (status==='Answering')){
-            getCorrectOptions();
-        }
-    }, [timer, status]);
+  const handleExit = () => {
+    if (!window.confirm('Are you sure to exit the game!')) return;
+    clearSession();
+    navigate('/');
+  };
 
+  const handleHome = () => {
+    clearSession();
+    navigate('/');
+  };
 
-    useEffect(() => {
-        if (time <= 0 || null) return;
-
-        if(time!==0){
-            sessionStorage.setItem('time', time);
-        }
-
-        const interval = setInterval(() => {
-            setTime((prevTimer) => prevTimer - 1);
-        }, 1000);
-
-        return () => clearInterval(interval);
-    }, [ time ]);
-
-    useEffect(() => {
-        const intervalId = setInterval(() => {
-            if (storedPin) {
-                getStatus();
-            }
-        }, 500);
-
-        return () => clearInterval(intervalId);
-    }, []);
-
-    
-
-    const handleSelectOption = (index) => {
-        setSelectedOption(selectedOption===index ? null : index);
-        sessionStorage.setItem('selectedOption', JSON.stringify(selectedOption===index ? null : index));
-        setMarks(500+(500*(time/timer)));
-        sessionStorage.setItem('currentMarks', (500+(500*(time/timer))));
-    };
-
-    const handleHome = () => {
-        localStorage.removeItem('gamePin');
-        sessionStorage.removeItem('runningIQuiz');
-        sessionStorage.removeItem('storedIndex');
-        sessionStorage.removeItem('time');
-        navigate('/');
-    };
+  const totalScore = myScores.reduce((acc, s) => acc + s, 0);
+  const isCorrect  = correctOptions.includes(Number(selectedOption));
 
   return (
-    <div className='showToPlayerSection'>
-      <i className='bx bxs-log-out back_arrow' onClick={handleExit}></i>
-      {
-        status === 'notStarted' ? <div className='shownStatus'>You are in the IQuiz, get ready for start!</div> :
-        status === 'ShowingQuestion' ? <div className='shownStatus'>Get ready!</div>:
-        status === 'Started' ? <>
-                                    <div className='shownStatus' style={{display:`${time==0 ? 'block' : 'none'}`}}>Loading...</div>
+    <div className="showToPlayerSection">
+      <i className="bx bxs-log-out back_arrow" onClick={handleExit}></i>
 
-                                    <div style={{display:`${time==0 ? 'none' : 'block'}`}}>
-                                        <div className='myoptions'>
-                                            <div className='mytimer' style={{paddingLeft:'100px'}}>
-                                                <span>{time}</span>
-                                            </div>
-                                            <div className='myoption'>
-                                                {["Option1", "Option2", "Option3", "Option4"].map((option, index) => (
-                                                    <div 
-                                                        key={index} 
-                                                        className={selectedOption == index ? 'myoption2Active' : ''} 
-                                                        onClick={() => handleSelectOption(index)}
-                                                    >
-                                                        {option}
-                                                    </div>
-                                                ))}
-                                            </div>
-                                        </div>
-                                    </div>
-                                </> :
-        status === 'Loading' ? <div className='shownStatus'>Loading...</div>:
-        ['Answering', 'Finished'].includes(status) ? 
-                                <div style={{display:`${time==0 ? 'flex' : 'none'}`}}>
-                                    <div className='myoptions2' style={{display:'flex', flexDirection:'column', gap:'80px', justifyContent:'center', alignItems:'center'}}>
-                                        <div>
-                                            <div className='resultT1'>{selectedOption ? (correctOptions.includes(Number(selectedOption)) ? 'Correct Option Selected!' : 'Incorrect Option Selected!') : 'No Option Selected!'}</div>
-                                            <div className='resultT2' style={{marginTop:'10px'}}>Current Score:- <i>{correctOptions.includes(Number(selectedOption)) ? marks : 0}</i></div>
-                                            <div className='resultT3'>Total Score:- <i>{myScores.reduce((acc, score) => acc + score, 0)}/{myScores.length}</i></div>
-                                        </div>
-                                        <div className='myoption2'>
-                                            {["Option1", "Option2", "Option3", "Option4"].map((option, index) => (
-                                                <div
-                                                    key={index}
-                                                    className={` ${selectedOption == index && !correctOptions.includes(index) ? 'incorrectOption' : ''}
-                                                                ${correctOptions.includes(index) ? 'correctOption' : ''}`.trim()}
-                                                >
-                                                    {option}
-                                                </div>
-                                            ))}
-                                        </div>
-                                    { status==='Finished' && <button onClick={handleHome} className='nextBtn' style={{color:'black'}}>Home</button>}
-                                    </div>
-                                </div> :  <div className='shownStatus'>Something went wrong!</div>
+      {status === 'notStarted' && (
+        <div className="shownStatus">You are in the IQuiz, get ready for start!</div>
+      )}
+      {status === 'ShowingQuestion' && (
+        <div className="shownStatus">Get ready!</div>
+      )}
+      {status === 'Loading' && (
+        <div className="shownStatus">Loading...</div>
+      )}
 
-        // status === 'Finished' ? <div className='shownStatus'>This IQuiz is finished!</div> : <div className='shownStatus'>Something went wrong!</div>
-      }
+      {status === 'Started' && (
+        time === 0 ? (
+          <div className="shownStatus">Loading...</div>
+        ) : (
+          <div>
+            <div className="myoptions">
+              <div className="mytimer" style={{ paddingLeft: '100px' }}>
+                <span>{time}</span>
+              </div>
+              <div className="myoption">
+                {['Option 1', 'Option 2', 'Option 3', 'Option 4'].map((label, i) => (
+                  <div
+                    key={i}
+                    className={selectedOption === i ? 'myoption2Active' : ''}
+                    onClick={() => handleSelectOption(i)}
+                  >
+                    {label}
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        )
+      )}
+
+      {['Answering', 'Finished'].includes(status) && time === 0 && (
+        <div style={{ display: 'flex' }}>
+          <div
+            className="myoptions2"
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '80px',
+              justifyContent: 'center',
+              alignItems: 'center',
+            }}
+          >
+            <div>
+              <div className="resultT1">
+                {selectedOption === null
+                  ? 'No Option Selected!'
+                  : isCorrect
+                  ? 'Correct Option Selected!'
+                  : 'Incorrect Option Selected!'}
+              </div>
+              <div className="resultT2" style={{ marginTop: '10px' }}>
+                Current Score:- <i>{isCorrect ? marks : 0}</i>
+              </div>
+              <div className="resultT3">
+                Total Score:- <i>{totalScore}</i>
+              </div>
+            </div>
+            <div className="myoption2">
+              {['Option 1', 'Option 2', 'Option 3', 'Option 4'].map((label, i) => (
+                <div
+                  key={i}
+                  className={`
+                    ${selectedOption === i && !correctOptions.includes(i) ? 'incorrectOption' : ''}
+                    ${correctOptions.includes(i) ? 'correctOption' : ''}
+                  `.trim()}
+                >
+                  {label}
+                </div>
+              ))}
+            </div>
+            {status === 'Finished' && (
+              <button onClick={handleHome} className="nextBtn" style={{ color: 'black' }}>
+                Home
+              </button>
+            )}
+          </div>
+        </div>
+      )}
     </div>
-  )
-}
+  );
+};
 
 export default ShowToPlayerPage;
