@@ -1,7 +1,8 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import socket from '../socket';
+import { BACKEND_URL } from '../App.js';
 
-const Home = ({ HOST, navigate, setShowSignUp }) => {
+const Home = ({ navigate, setShowSignUp }) => {
   const loggedinUser = localStorage.getItem('IQuiz_loginName');
   const storedPin    = localStorage.getItem('gamePin');
 
@@ -13,11 +14,10 @@ const Home = ({ HOST, navigate, setShowSignUp }) => {
   const [playerName, setPlayerName]       = useState('');
   const [players, setPlayers]             = useState([]);
 
-  // ─── Fetch saved IQuizzes ─────────────────────────────────────────────────
   const fetchIQuizzes = useCallback(async () => {
     if (!loggedinUser) return;
     try {
-      const response = await fetch(`${HOST}/iquiz/${loggedinUser}`);
+      const response = await fetch(`${BACKEND_URL}/iquiz/${loggedinUser}`);
       const data = await response.json();
       if (response.ok) {
         setIquizzes(data);
@@ -28,16 +28,13 @@ const Home = ({ HOST, navigate, setShowSignUp }) => {
       console.error('Error:', error);
       alert('Something went wrong, please try again!!');
     }
-  }, [HOST, loggedinUser]);
+  }, [loggedinUser]);
 
-  // ─── On mount ─────────────────────────────────────────────────────────────
   useEffect(() => {
     fetchIQuizzes();
-
     if (storedPin) {
       socket.emit('host:join', storedPin);
-      // Refresh player list in case of page reload
-      fetch(`${HOST}/runningIQuiz/players/${storedPin}`)
+      fetch(`${BACKEND_URL}/runningIQuiz/players/${storedPin}`)
         .then((r) => r.json())
         .then((data) => { if (Array.isArray(data)) setPlayers(data); })
         .catch(console.error);
@@ -45,7 +42,6 @@ const Home = ({ HOST, navigate, setShowSignUp }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // ─── WebSocket listeners ──────────────────────────────────────────────────
   useEffect(() => {
     const handlePlayersUpdate = (updatedPlayers) => setPlayers(updatedPlayers);
 
@@ -69,9 +65,8 @@ const Home = ({ HOST, navigate, setShowSignUp }) => {
       socket.off('game:ended', handleGameEnded);
       socket.off('game:statusUpdate', handleStatusUpdate);
     };
-  }, [navigate]);
+  }, [navigate, socket]);
 
-  // ─── Handlers ─────────────────────────────────────────────────────────────
   const handleLogout = () => {
     localStorage.removeItem('IQuiz_loginName');
     localStorage.removeItem('editingIQuiz');
@@ -86,7 +81,7 @@ const Home = ({ HOST, navigate, setShowSignUp }) => {
   const handleDelete = async (id) => {
     if (!window.confirm('Are you sure to Delete this IQuiz?')) return;
     try {
-      const response = await fetch(`${HOST}/iquiz/${id}`, { method: 'DELETE' });
+      const response = await fetch(`${BACKEND_URL}/iquiz/${id}`, { method: 'DELETE' });
       const data = await response.json();
       if (response.ok) {
         fetchIQuizzes();
@@ -103,9 +98,7 @@ const Home = ({ HOST, navigate, setShowSignUp }) => {
   const handleCross = async (pin) => {
     if (!window.confirm('Are you sure to stop hosting of this IQuiz?')) return;
     try {
-      const response = await fetch(`${HOST}/runningIQuiz/delete/${pin}`, {
-        method: 'DELETE',
-      });
+      const response = await fetch(`${BACKEND_URL}/runningIQuiz/delete/${pin}`, { method: 'DELETE' });
       const data = await response.json();
       if (response.ok || response.status === 404) {
         setCrossClicked(false);
@@ -132,7 +125,7 @@ const Home = ({ HOST, navigate, setShowSignUp }) => {
     localStorage.setItem('gamePin', pin);
 
     try {
-      const response = await fetch(`${HOST}/runningIQuiz/host`, {
+      const response = await fetch(`${BACKEND_URL}/runningIQuiz/host`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ loggedinUser, id: iquiz._id, pin }),
@@ -155,7 +148,7 @@ const Home = ({ HOST, navigate, setShowSignUp }) => {
 
   const handleJoin = async () => {
     try {
-      const response = await fetch(`${HOST}/runningIQuiz/join`, {
+      const response = await fetch(`${BACKEND_URL}/runningIQuiz/join`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ playerName, playerPin }),
@@ -179,15 +172,10 @@ const Home = ({ HOST, navigate, setShowSignUp }) => {
     const savedIQuiz = JSON.parse(sessionStorage.getItem('runningIQuiz'));
     const pin = localStorage.getItem('gamePin');
     try {
-      const response = await fetch(`${HOST}/runningIQuiz/status`, {
+      const response = await fetch(`${BACKEND_URL}/runningIQuiz/status`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          pin,
-          status: 'Started',
-          index: 0,
-          timer: savedIQuiz.questions[0].timer,
-        }),
+        body: JSON.stringify({ pin, status: 'Started', index: 0, timer: savedIQuiz.questions[0].timer }),
       });
       const data = await response.json();
       if (response.ok) {
@@ -205,7 +193,6 @@ const Home = ({ HOST, navigate, setShowSignUp }) => {
 
   return (
     <div className="homeSection">
-      {/* Profile card */}
       {loggedinUser && (
         <div className="profileCard" style={{ display: isProfileCard ? 'flex' : 'none' }}>
           <i className="bx bx-x cross" onClick={() => setIsProfileCard(false)}></i>
@@ -215,7 +202,6 @@ const Home = ({ HOST, navigate, setShowSignUp }) => {
         </div>
       )}
 
-      {/* Waiting-for-players popup */}
       <div className="popupSection" style={{ display: crossClicked ? 'flex' : 'none' }}>
         <div className="popupCard width95">
           <i className="bx bx-x cross cross1" onClick={() => handleCross(iquizPin)}></i>
@@ -236,12 +222,8 @@ const Home = ({ HOST, navigate, setShowSignUp }) => {
               style={{ background: 'green', cursor: players.length === 0 ? 'not-allowed' : 'pointer' }}
               disabled={players.length === 0}
               onClick={handleStart}
-            >
-              Start
-            </button>
-            <button style={{ background: 'red' }} onClick={() => handleCross(iquizPin)}>
-              Stop
-            </button>
+            >Start</button>
+            <button style={{ background: 'red' }} onClick={() => handleCross(iquizPin)}>Stop</button>
             <span className="allPlayers">
               <i className="bx bxs-user"></i>
               <p>{players.length}</p>
@@ -250,7 +232,6 @@ const Home = ({ HOST, navigate, setShowSignUp }) => {
         </div>
       </div>
 
-      {/* Navbar */}
       <nav>
         <div className="navbar">
           <div className="nav1"><span className="bName1">IQ</span><span className="bName2">uiz</span></div>
@@ -264,9 +245,7 @@ const Home = ({ HOST, navigate, setShowSignUp }) => {
             )}
             {loggedinUser && (
               <>
-                <span className="profile" onClick={() => setIsProfileCard(true)}>
-                  <i className="bx bxs-user"></i>
-                </span>
+                <span className="profile" onClick={() => setIsProfileCard(true)}><i className="bx bxs-user"></i></span>
                 <p>{loggedinUser}</p>
               </>
             )}
@@ -274,7 +253,6 @@ const Home = ({ HOST, navigate, setShowSignUp }) => {
         </div>
       </nav>
 
-      {/* Join form */}
       <div className="homePage">
         <form className="homePageForm" onSubmit={(e) => { e.preventDefault(); handleJoin(); }}>
           <p></p>
@@ -290,7 +268,6 @@ const Home = ({ HOST, navigate, setShowSignUp }) => {
         </button>
       </div>
 
-      {/* Saved quizzes */}
       {loggedinUser && (
         <div className="iquizStoreSection">
           <h1>Your saved IQuizzes</h1>
@@ -323,7 +300,7 @@ const Home = ({ HOST, navigate, setShowSignUp }) => {
         <div className="socialMedia">
           <a href="https://github.com/xritik" target="_blank" rel="noreferrer"><span className="media"><i className="bx bxl-github"></i></span></a>
           <a href="https://linkedin.com/in/xritik" target="_blank" rel="noreferrer"><span className="media"><i className="bx bxl-linkedin"></i></span></a>
-          <a href="https://instagram.com/xritik.07" target="_blank" rel="noreferrer"><span className="media"><i className="bx bxl-instagram"></i></span></a>
+          <a href="https://instagram.com/rittik__here" target="_blank" rel="noreferrer"><span className="media"><i className="bx bxl-instagram"></i></span></a>
         </div>
       </footer>
     </div>

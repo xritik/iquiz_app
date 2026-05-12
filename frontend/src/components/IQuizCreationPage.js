@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import '../css/iquiz_creation_page.css'
+import { BACKEND_URL } from '../App.js';
 
-const QuizCreation = ({ HOST, navigate }) => {
+const QuizCreation = ({ navigate }) => {
   const [iquizTitle, setIquizTitle] = useState('');
   const [iquizQuestions, setIquizQuestions] = useState([
     {
@@ -99,7 +100,7 @@ const QuizCreation = ({ HOST, navigate }) => {
         const quizData = { user: loggedinUser, title: iquizTitle, questions: iquizQuestions };
 
         try{
-            const response = await fetch(`${HOST}/iquiz`, {
+            const response = await fetch(`${BACKEND_URL}/iquiz`, {
                 method: 'POST',
                 headers:{
                 'Content-Type': 'application/json'

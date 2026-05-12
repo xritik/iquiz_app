@@ -1,8 +1,9 @@
 import React, { useEffect, useState, useRef, useCallback } from 'react';
 import '../css/showToPlayer_page.css';
 import socket from '../socket';
+import { BACKEND_URL } from '../App.js';
 
-const ShowToPlayerPage = ({ HOST, navigate }) => {
+const ShowToPlayerPage = ({ navigate }) => {
   const storedPin  = sessionStorage.getItem('playerPin');
   const storedName = sessionStorage.getItem('playerName');
 
@@ -23,7 +24,6 @@ const ShowToPlayerPage = ({ HOST, navigate }) => {
     JSON.parse(sessionStorage.getItem('myScores')) || []
   );
 
-  // Refs so socket callbacks always see latest values without stale closures
   const selectedOptionRef = useRef(selectedOption);
   const marksRef          = useRef(Number(sessionStorage.getItem('currentMarks')) || 0);
   const timerRef          = useRef(timer);
@@ -32,7 +32,6 @@ const ShowToPlayerPage = ({ HOST, navigate }) => {
   useEffect(() => { marksRef.current = marks; }, [marks]);
   useEffect(() => { timerRef.current = timer; }, [timer]);
 
-  // ─── Clear session storage and navigate home ──────────────────────────────
   const clearSession = useCallback(() => {
     sessionStorage.removeItem('playerPin');
     sessionStorage.removeItem('playerName');
@@ -43,23 +42,20 @@ const ShowToPlayerPage = ({ HOST, navigate }) => {
     sessionStorage.removeItem('myScores');
   }, []);
 
-  // ─── Guard: redirect if no session ────────────────────────────────────────
   useEffect(() => {
     if (!storedName || !storedPin) navigate('/');
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // ─── Join socket room once on mount ───────────────────────────────────────
   useEffect(() => {
     if (storedPin) socket.emit('player:join', storedPin);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // ─── Submit marks to server ───────────────────────────────────────────────
   const submitMarks = useCallback(async (correctOpts, selOption, earnedMarks, qIndex) => {
     const myMarks = correctOpts.includes(Number(selOption)) ? earnedMarks : 0;
     try {
-      const response = await fetch(`${HOST}/runningIQuiz/setMarks`, {
+      const response = await fetch(`${BACKEND_URL}/runningIQuiz/setMarks`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ storedPin, storedName, myMarks, index: qIndex }),
@@ -72,14 +68,11 @@ const ShowToPlayerPage = ({ HOST, navigate }) => {
     } catch (error) {
       console.error(error);
     }
-  }, [HOST, storedPin, storedName]);
+  }, [storedPin, storedName]);
 
-  // ─── Fetch correct options for a question ────────────────────────────────
   const getCorrectOptions = useCallback(async (iquizId, qIndex) => {
     try {
-      const response = await fetch(
-        `${HOST}/iquiz/correctOptions/${iquizId}/${qIndex}`
-      );
+      const response = await fetch(`${BACKEND_URL}/iquiz/correctOptions/${iquizId}/${qIndex}`);
       const data = await response.json();
       if (response.ok) {
         setCorrectOptions(data.correctOptions);
@@ -89,19 +82,16 @@ const ShowToPlayerPage = ({ HOST, navigate }) => {
       console.error(error);
     }
     return [];
-  }, [HOST]);
+  }, []);
 
-  // ─── WebSocket: game status updates ──────────────────────────────────────
   useEffect(() => {
     const handleStatusUpdate = async (data) => {
       const { status: newStatus, index: newIndex, timer: newTimer, id } = data;
-
       setStatus(newStatus);
 
       if (newStatus === 'Started') {
         const prevIndex = sessionStorage.getItem('storedIndex');
         if (String(newIndex) !== String(prevIndex)) {
-          // New question — reset state
           setSelectedOption(null);
           selectedOptionRef.current = null;
           setMarks(0);
@@ -138,16 +128,13 @@ const ShowToPlayerPage = ({ HOST, navigate }) => {
       socket.off('game:statusUpdate', handleStatusUpdate);
       socket.off('game:ended', handleGameEnded);
     };
-  }, [navigate, getCorrectOptions, submitMarks, clearSession]);
+  }, [navigate, socket, getCorrectOptions, submitMarks, clearSession]);
 
-  // ─── Initial status fetch (handles page refresh / reconnect) ─────────────
   useEffect(() => {
     if (!storedPin) return;
     const fetchInitialStatus = async () => {
       try {
-        const response = await fetch(
-          `${HOST}/runningIQuiz/status/${storedPin}`
-        );
+        const response = await fetch(`${BACKEND_URL}/runningIQuiz/status/${storedPin}`);
         const data = await response.json();
         if (response.ok) {
           setStatus(data.status);
@@ -160,7 +147,6 @@ const ShowToPlayerPage = ({ HOST, navigate }) => {
             setTime(savedTime > 0 ? savedTime : t);
           } else if (['Answering', 'Finished'].includes(data.status)) {
             setTime(0);
-            // Restore correct options so highlights show correctly after a refresh
             getCorrectOptions(data.id, data.index);
           }
         } else if (response.status === 400) {
@@ -175,26 +161,18 @@ const ShowToPlayerPage = ({ HOST, navigate }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // ─── Local countdown ──────────────────────────────────────────────────────
   useEffect(() => {
     if (time === null || time <= 0) return;
-
     sessionStorage.setItem('time', time);
-
     const interval = setInterval(() => {
       setTime((prev) => {
-        if (prev <= 1) {
-          clearInterval(interval);
-          return 0;
-        }
+        if (prev <= 1) { clearInterval(interval); return 0; }
         return prev - 1;
       });
     }, 1000);
-
     return () => clearInterval(interval);
   }, [time]);
 
-  // ─── Option selection ─────────────────────────────────────────────────────
   const handleSelectOption = (optionIndex) => {
     if (time === 0 || status !== 'Started') return;
     const newSelection = selectedOption === optionIndex ? null : optionIndex;
@@ -225,32 +203,18 @@ const ShowToPlayerPage = ({ HOST, navigate }) => {
     <div className="showToPlayerSection">
       <i className="bx bxs-log-out back_arrow" onClick={handleExit}></i>
 
-      {status === 'notStarted' && (
-        <div className="shownStatus">You are in the IQuiz, get ready for start!</div>
-      )}
-      {status === 'ShowingQuestion' && (
-        <div className="shownStatus">Get ready!</div>
-      )}
-      {status === 'Loading' && (
-        <div className="shownStatus">Loading...</div>
-      )}
+      {status === 'notStarted' && <div className="shownStatus">You are in the IQuiz, get ready for start!</div>}
+      {status === 'ShowingQuestion' && <div className="shownStatus">Get ready!</div>}
+      {status === 'Loading' && <div className="shownStatus">Loading...</div>}
 
       {status === 'Started' && (
-        time === 0 ? (
-          <div className="shownStatus">Loading...</div>
-        ) : (
+        time === 0 ? <div className="shownStatus">Loading...</div> : (
           <div>
             <div className="myoptions">
-              <div className="mytimer" style={{ paddingLeft: '100px' }}>
-                <span>{time}</span>
-              </div>
+              <div className="mytimer" style={{ paddingLeft: '100px' }}><span>{time}</span></div>
               <div className="myoption">
                 {['Option 1', 'Option 2', 'Option 3', 'Option 4'].map((label, i) => (
-                  <div
-                    key={i}
-                    className={selectedOption === i ? 'myoption2Active' : ''}
-                    onClick={() => handleSelectOption(i)}
-                  >
+                  <div key={i} className={selectedOption === i ? 'myoption2Active' : ''} onClick={() => handleSelectOption(i)}>
                     {label}
                   </div>
                 ))}
@@ -262,49 +226,22 @@ const ShowToPlayerPage = ({ HOST, navigate }) => {
 
       {['Answering', 'Finished'].includes(status) && time === 0 && (
         <div style={{ display: 'flex' }}>
-          <div
-            className="myoptions2"
-            style={{
-              display: 'flex',
-              flexDirection: 'column',
-              gap: '80px',
-              justifyContent: 'center',
-              alignItems: 'center',
-            }}
-          >
+          <div className="myoptions2" style={{ display: 'flex', flexDirection: 'column', gap: '80px', justifyContent: 'center', alignItems: 'center' }}>
             <div>
               <div className="resultT1">
-                {selectedOption === null
-                  ? 'No Option Selected!'
-                  : isCorrect
-                  ? 'Correct Option Selected!'
-                  : 'Incorrect Option Selected!'}
+                {selectedOption === null ? 'No Option Selected!' : isCorrect ? 'Correct Option Selected!' : 'Incorrect Option Selected!'}
               </div>
-              <div className="resultT2" style={{ marginTop: '10px' }}>
-                Current Score:- <i>{isCorrect ? marks : 0}</i>
-              </div>
-              <div className="resultT3">
-                Total Score:- <i>{totalScore}</i>
-              </div>
+              <div className="resultT2" style={{ marginTop: '10px' }}>Current Score:- <i>{isCorrect ? marks : 0}</i></div>
+              <div className="resultT3">Total Score:- <i>{totalScore}</i></div>
             </div>
             <div className="myoption2">
               {['Option 1', 'Option 2', 'Option 3', 'Option 4'].map((label, i) => (
-                <div
-                  key={i}
-                  className={`
-                    ${selectedOption === i && !correctOptions.includes(i) ? 'incorrectOption' : ''}
-                    ${correctOptions.includes(i) ? 'correctOption' : ''}
-                  `.trim()}
-                >
+                <div key={i} className={`${selectedOption === i && !correctOptions.includes(i) ? 'incorrectOption' : ''} ${correctOptions.includes(i) ? 'correctOption' : ''}`.trim()}>
                   {label}
                 </div>
               ))}
             </div>
-            {status === 'Finished' && (
-              <button onClick={handleHome} className="nextBtn" style={{ color: 'black' }}>
-                Home
-              </button>
-            )}
+            {status === 'Finished' && <button onClick={handleHome} className="nextBtn" style={{ color: 'black' }}>Home</button>}
           </div>
         </div>
       )}

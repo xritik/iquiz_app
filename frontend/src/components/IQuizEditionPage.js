@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
+import { BACKEND_URL } from '../App.js';
 
-const IQuizEditionPage = ({ HOST, navigate }) => {
+const IQuizEditionPage = ({ navigate }) => {
     const loggedinUser = localStorage.getItem('IQuiz_loginName');
     const storedIQuiz = JSON.parse(localStorage.getItem('editingIQuiz')) || [];
     const [iquizTitle, setIquizTitle] = useState(storedIQuiz.title || '');
@@ -105,7 +106,7 @@ const IQuizEditionPage = ({ HOST, navigate }) => {
         const quizData = { user: loggedinUser, title: iquizTitle, questions: iquizQuestions };
 
         try{
-            const response = await fetch(`${HOST}/iquiz/${storedIQuiz._id}`, {
+            const response = await fetch(`${BACKEND_URL}/iquiz/${storedIQuiz._id}`, {
                 method: 'POST',
                 headers:{
                 'Content-Type': 'application/json'

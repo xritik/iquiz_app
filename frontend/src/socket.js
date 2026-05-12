@@ -1,14 +1,16 @@
 // src/socket.js
-// Single shared Socket.io client instance for the whole app.
-// Import { socket } wherever you need to emit or listen.
+// Connects to the backend server (Render) where Socket.io actually runs.
+// On Vercel the frontend is static — WebSockets must go directly to Render.
 
 import { io } from 'socket.io-client';
 
-const HOST = window.location.hostname;
-const socket = io(`http://${HOST}:5000`, {
+const BACKEND_URL = process.env.REACT_APP_API_URL || `http://${window.location.hostname}:5000`;
+
+const socket = io(BACKEND_URL, {
   autoConnect: true,
   reconnectionAttempts: 5,
   reconnectionDelay: 1000,
+  transports: ['websocket', 'polling'], // try WebSocket first, fall back to polling
 });
 
 export default socket;

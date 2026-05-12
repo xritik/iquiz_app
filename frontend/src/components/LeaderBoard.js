@@ -1,15 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import '../css/leader_board.css';
 import socket from '../socket';
+import { BACKEND_URL } from '../App.js';
 
-const LeaderBoard = ({ HOST, navigate }) => {
+const LeaderBoard = ({ navigate }) => {
   const storedRunningIQuiz = JSON.parse(sessionStorage.getItem('runningIQuiz'));
   const storedPin          = localStorage.getItem('gamePin');
 
   const [index, setIndex]     = useState(Number(sessionStorage.getItem('storedIndex')) || 0);
   const [players, setPlayers] = useState([]);
 
-  // ─── Guard ────────────────────────────────────────────────────────────────
   useEffect(() => {
     if (!storedPin) {
       sessionStorage.removeItem('runningIQuiz');
@@ -20,29 +20,21 @@ const LeaderBoard = ({ HOST, navigate }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // ─── Join socket room as host ─────────────────────────────────────────────
   useEffect(() => {
     if (storedPin) socket.emit('host:join', storedPin);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // ─── Initial data fetch ───────────────────────────────────────────────────
   useEffect(() => {
     if (!storedPin) return;
     const fetchStatus = async () => {
       try {
-        const response = await fetch(
-          `${HOST}/runningIQuiz/status/${storedPin}`
-        );
+        const response = await fetch(`${BACKEND_URL}/runningIQuiz/status/${storedPin}`);
         const data = await response.json();
         if (response.ok) {
           setIndex(data.index ?? 0);
           setPlayers(data.players || []);
-          // If the quiz is fully finished, release the pin immediately
-          // so the host can start a new game without clicking Home first
-          if (data.status === 'Finished') {
-            localStorage.removeItem('gamePin');
-          }
+          if (data.status === 'Finished') localStorage.removeItem('gamePin');
         } else if (response.status === 400) {
           navigate('/');
         }
@@ -54,11 +46,8 @@ const LeaderBoard = ({ HOST, navigate }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // ─── WebSocket: live leaderboard & game-ended ────────────────────────────
   useEffect(() => {
-    const handleLeaderboardUpdate = (updatedPlayers) => {
-      setPlayers([...updatedPlayers]);
-    };
+    const handleLeaderboardUpdate = (updatedPlayers) => setPlayers([...updatedPlayers]);
 
     const handleGameEnded = () => {
       sessionStorage.removeItem('runningIQuiz');
@@ -75,14 +64,13 @@ const LeaderBoard = ({ HOST, navigate }) => {
       socket.off('leaderboard:update', handleLeaderboardUpdate);
       socket.off('game:ended', handleGameEnded);
     };
-  }, [navigate]);
+  }, [navigate, socket]);
 
-  // ─── Next question ────────────────────────────────────────────────────────
   const handleNext = async () => {
     const newIndex = index + 1;
     const newTime  = storedRunningIQuiz.questions[newIndex].timer;
     try {
-      const response = await fetch(`${HOST}/runningIQuiz/status`, {
+      const response = await fetch(`${BACKEND_URL}/runningIQuiz/status`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ pin: storedPin, status: 'Started', index: newIndex, timer: newTime }),
@@ -109,7 +97,6 @@ const LeaderBoard = ({ HOST, navigate }) => {
     navigate('/');
   };
 
-  // ─── Sort by total score descending ──────────────────────────────────────
   const sortedPlayers = [...players].sort((a, b) => {
     const sumA = a.scores.reduce((acc, s) => acc + s, 0);
     const sumB = b.scores.reduce((acc, s) => acc + s, 0);
@@ -121,14 +108,9 @@ const LeaderBoard = ({ HOST, navigate }) => {
   return (
     <div className="leaderBoardSection">
       <h1>LeaderBoard</h1>
-
       <table className="leaderBoardTable">
         <thead>
-          <tr>
-            <th>#</th>
-            <th>Player</th>
-            <th>Points</th>
-          </tr>
+          <tr><th>#</th><th>Player</th><th>Points</th></tr>
         </thead>
         <tbody>
           {sortedPlayers.map((player, i) => (
@@ -140,7 +122,6 @@ const LeaderBoard = ({ HOST, navigate }) => {
           ))}
         </tbody>
       </table>
-
       {totalQuestions > index + 1 ? (
         <button onClick={handleNext} className="nextBtn" style={{ color: 'black' }}>Next</button>
       ) : (
