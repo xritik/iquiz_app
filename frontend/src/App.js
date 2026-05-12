@@ -1,7 +1,7 @@
 import { Route, Routes, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import Home from './components/Home.js';
-import Login_Signup from './components/LoginSignup.js';
+import LoginSignup from './components/LoginSignup.js';
 import IQuizCreationPage from "./components/IQuizCreationPage.js";
 import IQuizEditionPage from "./components/IQuizEditionPage.js";
 import NotFoundPage from "./components/NotFoundPage.js";
