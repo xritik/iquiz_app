@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import '../css/login_signup.css';
 import { BACKEND_URL } from '../App.js';
 
-const Login_Signup = ({navigate, showSignUp, setShowSignUp }) => {
+const LoginSignup = ({navigate, showSignUp, setShowSignUp }) => {
 
   const [name, setName] = useState('');
   const [password, setPassword] = useState('');
@@ -150,4 +150,4 @@ const Login_Signup = ({navigate, showSignUp, setShowSignUp }) => {
   )
 }
 
-export default Login_Signup;
+export default LoginSignup;

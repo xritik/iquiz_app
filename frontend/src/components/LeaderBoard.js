@@ -64,7 +64,7 @@ const LeaderBoard = ({ navigate }) => {
       socket.off('leaderboard:update', handleLeaderboardUpdate);
       socket.off('game:ended', handleGameEnded);
     };
-  }, [navigate, socket]);
+  }, [navigate]);
 
   const handleNext = async () => {
     const newIndex = index + 1;

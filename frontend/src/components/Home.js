@@ -65,7 +65,7 @@ const Home = ({ navigate, setShowSignUp }) => {
       socket.off('game:ended', handleGameEnded);
       socket.off('game:statusUpdate', handleStatusUpdate);
     };
-  }, [navigate, socket]);
+  }, [navigate]);
 
   const handleLogout = () => {
     localStorage.removeItem('IQuiz_loginName');

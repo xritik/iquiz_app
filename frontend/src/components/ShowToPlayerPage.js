@@ -128,7 +128,7 @@ const ShowToPlayerPage = ({ navigate }) => {
       socket.off('game:statusUpdate', handleStatusUpdate);
       socket.off('game:ended', handleGameEnded);
     };
-  }, [navigate, socket, getCorrectOptions, submitMarks, clearSession]);
+  }, [navigate, getCorrectOptions, submitMarks, clearSession]);
 
   useEffect(() => {
     if (!storedPin) return;

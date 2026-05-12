@@ -92,7 +92,7 @@ const QuestionPage = ({ navigate }) => {
     };
     socket.on('game:statusUpdate', handleStatusUpdate);
     return () => socket.off('game:statusUpdate', handleStatusUpdate);
-  }, [socket]);
+  }, []);
 
   if (!storedRunningIQuiz) return null;
 
