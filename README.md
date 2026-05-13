@@ -1,18 +1,24 @@
 # 🧠 IQuiz – MERN Stack Live Quiz App
 
-A full-stack real-time quiz application inspired by Kahoot!, built using the MERN stack (MongoDB, Express.js, React.js, Node.js). Users can create, edit, and delete quizzes, then host them live using a PIN that other players can use to join.
+A full-stack real-time quiz application inspired by Kahoot!, built using the MERN stack (MongoDB, Express.js, React.js, Node.js). Users can create, edit, and delete quizzes, then host them live using a PIN that other players can use to join — with instant real-time communication powered by Socket.io WebSockets.
 <br>
+
+## 🔴 Now RiChat App is Live [here](https://iquiz7.vercel.app).
 <br>
 
 ## 🚀 Features
 
 - ✅ User Registration & Login (with validation)
 - ✅ Create, Edit & Delete Custom Quizzes
-- ✅ Real-Time Multiplayer Quiz Hosting
+- ✅ Real-Time Multiplayer Quiz Hosting via WebSockets (Socket.io)
 - ✅ Auto-generated Quiz PIN for Players
 - ✅ Player Join via PIN
 - ✅ Live Question Broadcasting and Answer Submission
-- ✅ MongoDB for Persistent Storage
+- ✅ Time-based Scoring (faster answers = more points)
+- ✅ Live Leaderboard sorted by score after each question
+- ✅ Correct/Incorrect answer highlighting after timer ends
+- ✅ MongoDB Atlas for cloud persistent storage
+- ✅ Deployed on Vercel (frontend) + Render (backend)
 - ✅ Clean and Responsive UI
 <br>
 <br>
@@ -58,6 +64,7 @@ iquiz_app/                                             <br>
 │   ├── css/                                           <br>
 │   ├── imgs/                                          <br>
 │   ├── App.js                                         <br>
+│   ├── socket.js   # Shared Socket.io client          <br>
 │   └── index.css                                      <br>
 │   └── index.js                                       <br>
 │ └── package.json  # Frontend metadata and scripts    <br>
@@ -80,12 +87,13 @@ iquiz_app/                                             <br>
 **Frontend:**
 
 - React.js
+- Socket.io-client
 - HTML/CSS
 
 **Backend:**
 
-- Node.js
-- Express.js
+- Node.js & Express.js
+- Socket.io
 - MongoDB with Mongoose
 
 <br>
@@ -132,6 +140,13 @@ cd iquiz_app
 npm install
 ```
 
+- **Backend:**
+
+```bash
+cd backend
+npm install
+```
+
 - **Frontend:**
 
 ```bash
@@ -139,32 +154,43 @@ cd ../frontend
 npm install
 ```
 
-- **Backend:**
+<br>
+<br>
 
+**3. Environment Variables**
+
+Backend — backend/.env
 ```bash
-cd backend
-npm install
+MONGO_URI=mongodb+srv://<username>:<password>@cluster0.xxxxx.mongodb.net/mydb?retryWrites=true&w=majority
+PORT=5000
 ```
-<br>
-<br>
 
-**3. Run the Application**
+Frontend — frontend/.env
+```bash
+REACT_APP_API_URL=https://backend-api-url.com
+REACT_APP_WS_URL=wss://backend-api-url.com
+```
+
+**4. Run the Application**
 ```bash
 cd ../
 npm start
 ```
+The app is [live here](https://iquiz7.vercel.app).
 <br>
 <br>
 
 ## 🌐 Usage:
 
+- Open https://iquiz7.vercel.app in your browser.
 - Register or login with an existing account.
-- Create a new quiz by adding questions and options.
-- Host the quiz — you'll receive a PIN.
-- Share the PIN with others so they can join.
-- Control the flow of the quiz as the host while players answer questions in real-time.
+- Create a new quiz by adding questions, options and timers.
+- Click Host Live on any saved quiz — you'll receive a 6-digit PIN.
+- Share the PIN with players so they can join from the home page.
+- Once all players have joined, click Start.
+- Questions are shown to the host; players see answer options in real-time.
+- After each question timer ends, correct answers are revealed and scores update.
+- The leaderboard is shown after each question; click Next to continue.
+- After the final question, click Home to end the session.
 <br>
 <br>
-
-## 👨‍💻 Author
-Developed with ❤️ by [Ritik](https://github.com/xritik).
